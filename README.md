@@ -28,7 +28,8 @@ Productivize is a web application designed to provide users with a versatile pla
 - **Tags:** Implement the ability to add tags to pages. Each page can have multiple tags, and each tag can be associated with multiple pages. This many-to-many relationship allows users to categorize and filter their pages based on tags.
 
 - **SQL Diagrams:**
-![Many-to-Many]("../public/productivize.png") 
+![SQL Diagrams for Productivize](https://github.com/jstellmacher/productivize/assets/86083839/e85d9b64-082d-4f31-ba76-9d07247f009f)
+ 
 ## Reach Features
 
 **Advanced Formatting Options:** Enhance the text editing capabilities to allow users to customize the appearance of text, add tables, bullet points, and more.
