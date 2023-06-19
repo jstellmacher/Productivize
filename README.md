@@ -1,28 +1,31 @@
 ## Productivize
 
 Productivize is a web application that empowers users with productivity and note-taking tools, task management, project tracking, and collaboration capabilities, offering a unique blend of functionality and personalized features.
-
+ **Note:**For the purposes of learning, I will leave my notes in my code for understanding my thought process and if I look back at it.
 ## Table of Contents
-Introduction
-Features
-Technologies
-Installation
-Usage
-Contributing
-License
-Introduction
+- [Introduction](#introduction)
+- [Features](#features)
+- [Technologies](#technologies)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Contributing](#contributing)
+- [License](#license)
+
+# Introduction
 Productivize is a web application designed to provide users with a versatile platform for organizing their work, managing tasks and projects, and collaborating with others. With a touch of personalization and innovative features, Productivize aims to enhance the user experience and boost productivity.
 
 # Features
 
 ## MVP Features
 
-User Registration and Authentication: Allow users to create an account and authenticate themselves to access the application.
-Page Creation and Organization: Enable users to create pages and organize them based on their preferences.
-Block-Based Content: Support block-based content creation, allowing users to add various types of content to their pages.
-Basic Collaboration: Provide basic collaboration capabilities, allowing users to share pages and collaborate with others.
-Additional Many-to-Many Features
-Tags: Implement the ability to add tags to pages. Each page can have multiple tags, and each tag can be associated with multiple pages. This many-to-many relationship allows users to categorize and filter their pages based on tags.
+- **User Registration and Authentication:** Allow users to create an account and authenticate themselves to access the application.
+- **Page Creation and Organization:** Enable users to create pages and organize them based on their preferences.
+- **Block-Based Content:** Support block-based content creation, allowing users to add various types of content to their pages.
+- **Basic Collaboration:** Provide basic collaboration capabilities, allowing users to share pages and collaborate with others.
+
+## Additional Many-to-Many Features
+
+- **Tags:** Implement the ability to add tags to pages. Each page can have multiple tags, and each tag can be associated with multiple pages. This many-to-many relationship allows users to categorize and filter their pages based on tags.
 
 ## Reach Features
 
