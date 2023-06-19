@@ -51,6 +51,9 @@ Advanced Collaboration: Implement real-time chat functionality within shared pag
 2. Install the required dependencies using npm install or yarn install in the project root directory.
 3. Set up the backend server and frontend server by running `python app.py` for the backend server and `npm start` for the frontend server.
 ## Usage
+If there are any installation dependencies issues use the following command in your project folder in your terminal:
+`$ pipenv install flask flask-sqlalchemy flask-migrate sqlalchemy-serializer flask-restful flask-cors
+`
 
 Start the backend server by running python app.py in the backend directory.
 Start the frontend development server using npm start or yarn start in the project root directory.
