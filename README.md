@@ -29,26 +29,24 @@ Productivize is a web application designed to provide users with a versatile pla
 
 ## Reach Features
 
-Advanced Formatting Options: Enhance the text editing capabilities to allow users to customize the appearance of text, add tables, bullet points, and more.
+**Advanced Formatting Options:** Enhance the text editing capabilities to allow users to customize the appearance of text, add tables, bullet points, and more.
 Task Management and Project Tracking: Introduce advanced task management features, including the ability to create and assign tasks, set due dates, and track progress.
 Integration with External Services: Enable integration with popular third-party services like Google Drive, Dropbox, or GitHub to import and sync content.
 Advanced Collaboration: Implement real-time chat functionality within shared pages, allowing users to communicate and discuss in real-time.
 
 ## Technologies
 
-React.js: A JavaScript library for building user interfaces.
-Flask: A lightweight Python web framework.
-SQLAlchemy: An SQL toolkit and Object-Relational Mapping (ORM) library.
-Socket.io: A real-time web application framework for enabling live collaboration and instant messaging between users.
-PostgreSQL: An open-source relational database management system.
+- **React.js:** A JavaScript library for building user interfaces.
+- **Flask:** A lightweight Python web framework.
+- **SQLAlchemy:** An SQL toolkit and Object-Relational Mapping (ORM) library.
+- **Socket.io:** A real-time web application framework for enabling live collaboration and instant messaging between users.
+- **PostgreSQL:** An open-source relational database management system.
 
 ## Installation
 
-Clone the repository.
-Install the required dependencies using npm install or yarn install in the project root directory.
-Set up the backend server by following the instructions in the backend/README.md file.
-Set up the PostgreSQL database by following the instructions in the backend/README.md file.
-
+1. Clone the repository.
+2. Install the required dependencies using npm install or yarn install in the project root directory.
+3. Set up the backend server and frontend server by running `python app.py` for the backend server and `npm start` for the frontend server.
 ## Usage
 
 Start the backend server by running python app.py in the backend directory.
@@ -61,4 +59,6 @@ Contributions are welcome! If you have any ideas, suggestions, or improvements, 
 
 ## License
 
-This project is licensed under the MIT License.
+~~This project is licensed under the MIT License.~~
+
+Have yet to define ^License
