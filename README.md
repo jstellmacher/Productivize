@@ -37,7 +37,7 @@ Task Management and Project Tracking: Introduce advanced task management feature
 Integration with External Services: Enable integration with popular third-party services like Google Drive, Dropbox, or GitHub to import and sync content.
 Advanced Collaboration: Implement real-time chat functionality within shared pages, allowing users to communicate and discuss in real-time.
 
-## User Stories (Agile)
+## User Stories Core & Reach(Agile)
 1. As a user, I want to create an account and log in, so that I can access my personalized workspace.
 
 2. As a user, I want to create a new page, so that I can organize my content effectively.
