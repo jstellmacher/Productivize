@@ -37,6 +37,30 @@ Task Management and Project Tracking: Introduce advanced task management feature
 Integration with External Services: Enable integration with popular third-party services like Google Drive, Dropbox, or GitHub to import and sync content.
 Advanced Collaboration: Implement real-time chat functionality within shared pages, allowing users to communicate and discuss in real-time.
 
+## User Stories (Agile)
+1. As a user, I want to create an account and log in, so that I can access my personalized workspace.
+
+2. As a user, I want to create a new page, so that I can organize my content effectively.
+
+3. As a user, I want to add different types of blocks (text, image, checklist, etc.) to my pages, so that I can structure and customize my content.
+
+4. As a user, I want to be able to drag and drop blocks within a page, so that I can rearrange the content according to my preferences.
+
+5. As a user, I want to collaborate with others on a page, so that we can work together and make changes simultaneously.
+
+6. As a user, I want to have a kanban board or a similar organizational tool, so that I can manage my tasks and keep track of their progress.
+
+7. As a user, I want to be able to search for pages or blocks based on keywords, so that I can quickly find the information I need.
+
+8. As a user, I want to have different access levels (read-only, edit, admin) for sharing pages with others, so that I can control the permissions and protect my data.
+
+9. As a user, I want to customize the appearance of my pages with different themes or templates, so that I can create a visually appealing workspace.
+
+10. As a user, I want to receive notifications or updates when changes are made to shared pages, so that I can stay informed about the latest modifications.
+
+11. As a user, I want to have the ability to undo or revert changes made to a page, so that I can easily revert any unintended modifications.
+
+12. As a user, I want to have a responsive and intuitive UI, so that I can seamlessly navigate and interact with the application on different devices.
 ## Technologies
 
 - **React.js:** A JavaScript library for building user interfaces.

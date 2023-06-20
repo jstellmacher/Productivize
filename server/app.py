@@ -1,10 +1,10 @@
-from flask import Flask, request, session
-from flask_restful import Api, Resource
+from flask import request, session
+from flask_restful import Resource
+from config import app, api, db
 from models import User, Page, Tag, PageTag, Collaborator
 
-app = Flask(__name__)
-app.secret_key = "your-secret-key"  # Set a secret key for session management
-api = Api(app)
+
+
 
 # User resource
 class UserResource(Resource):
@@ -82,20 +82,80 @@ class TagResource(Resource):
 
     # ... (other methods for POST, PUT, DELETE)
 
-# PageTag resource
+# Page Tag resource
 class PageTagResource(Resource):
-    # ... (methods for handling PageTag)
+    def get(self, page_id):
+        page = Page.query.get(page_id)
+        if page:
+            page_tags = page.tags
+            return [tag.to_dict() for tag in page_tags], 200
+        return {"message": "Page not found"}, 404
+
+    def post(self, page_id):
+        page = Page.query.get(page_id)
+        if not page:
+            return {"message": "Page not found"}, 404
+
+        data = request.json
+        if not data:
+            return {"message": "Invalid request data"}, 400
+
+        tag_id = data.get("tag_id")
+        if not tag_id:
+            return {"message": "Missing required field 'tag_id'"}, 400
+
+        tag = Tag.query.get(tag_id)
+        if not tag:
+            return {"message": "Tag not found"}, 404
+
+        page_tag = PageTag(page_id=page_id, tag_id=tag_id)
+        db.session.add(page_tag)
+        db.session.commit()
+
+        return page_tag.to_dict(), 201
+
+    # ... (other methods for PUT, DELETE)
 
 # Collaborator resource
 class CollaboratorResource(Resource):
-    # ... (methods for handling Collaborator)
+    def get(self, page_id):
+        page = Page.query.get(page_id)
+        if page:
+            collaborators = page.collaborators
+            return [collaborator.to_dict() for collaborator in collaborators], 200
+        return {"message": "Page not found"}, 404
+
+    def post(self, page_id):
+        page = Page.query.get(page_id)
+        if not page:
+            return {"message": "Page not found"}, 404
+
+        data = request.json
+        if not data:
+            return {"message": "Invalid request data"}, 400
+
+        user_id = data.get("user_id")
+        if not user_id:
+            return {"message": "Missing required field 'user_id'"}, 400
+
+        user = User.query.get(user_id)
+        if not user:
+            return {"message": "User not found"}, 404
+
+        collaborator = Collaborator(page_id=page_id, user_id=user_id)
+        db.session.add(collaborator)
+        db.session.commit()
+
+        return collaborator.to_dict(), 201
+
+    # ... (other methods for PUT, DELETE)
 
 # Routes
 api.add_resource(UserResource, "/users")
 api.add_resource(PageResource, "/pages", "/pages/<int:page_id>")
 api.add_resource(TagResource, "/tags", "/tags/<int:tag_id>")
-api.add_resource(PageTagResource, "/page-tags")
-api.add_resource(CollaboratorResource, "/collaborators")
+api.add_resource(PageTagResource, "/pages/<int:page_id>/tags")
+api.add_resource(CollaboratorResource, "/pages/<int:page_id>/collaborators")
 
 if __name__ == "__main__":
     app.run(debug=True)
