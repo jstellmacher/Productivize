@@ -4,7 +4,7 @@ import Nav from './Nav';
 import Home from './Home';
 import Pages from './Pages';
 import { Login } from './Login';
-import SignUp from './Signup';
+import Signup from './Signup';
 import '../index.css'
 
 const App = () => {
@@ -70,7 +70,7 @@ const App = () => {
             <Login />
           </Route>
           <Route path="/signup">
-            <SignUp />
+            <Signup />
           </Route>
         </Switch>
 
