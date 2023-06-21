@@ -4,7 +4,7 @@ import Nav from './Nav';
 import Home from './Home';
 import Pages from './Pages';
 import { Login } from './Login';
-
+import '../index.css'
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
