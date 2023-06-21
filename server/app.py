@@ -16,6 +16,61 @@ class UserResource(Resource):
         
         return {'message': 'User created successfully'}, 201
 
+    def login(self):
+        # Handle user login
+        data = request.get_json()
+        username = data.get('username')
+        password = data.get('password')
+
+        # Validate and handle login logic
+        user = User.query.filter_by(username=username).first()
+        if user and user.check_password(password):
+            # Login successful
+            session['user_id'] = user.id
+            return {'message': 'Login successful'}, 200
+        else:
+            # Login failed
+            return {'message': 'Invalid username or password'}, 401
+
+    def logout(self):
+        session.clear()
+        return {"message": "Logout successful! Have a great day!"}, 200
+
+    def get(self):
+        # Get the authenticated user's ID from the session
+        user_id = session.get('user_id')
+        if user_id:
+            # Retrieve the user object
+            user = User.query.get(user_id)
+            if user:
+                # Access the user's pages relationship
+                user_pages = user.pages
+                return {'pages': [page.serialize() for page in user_pages]}, 200
+            else:
+                return {'message': 'User not found'}, 404
+        else:
+            return {'message': 'Not authenticated'}, 401
+
+
+class SignUpResource(Resource):
+    def post(self):
+        # Sign up a new user
+        data = request.get_json()
+        username = data.get('username')
+        password = data.get('password')
+        email = data.get('email')
+        
+        # Validate and handle user sign-up logic
+        
+        # Create a new user object
+        new_user = User(username=username, password=password, email=email)
+        
+        # Save the user to the database
+        db.session.add(new_user)
+        db.session.commit()
+        
+        return {'message': 'User signed up successfully'}, 201
+
 
 class PageResource(Resource):
     def get(self, page_id=None):
@@ -39,7 +94,43 @@ class PageResource(Resource):
         
         # Validate and handle page creation logic
         
-        return {'message': 'Page created successfully'}, 201
+        # Create a new page object
+        new_page = Page(title=title, user_id=session['user_id'])
+        
+        # Save the page to the database
+        db.session.add(new_page)
+        db.session.commit()
+        
+        return {'message': 'Page created successfully', 'page_id': new_page.id}, 201
+
+    def put(self, page_id):
+        # Update an existing page
+        data = request.get_json()
+        title = data.get('title')
+
+        # Validate and handle page update logic
+
+        page = Page.query.get(page_id)
+        if page is None:
+            return {'message': 'Page not found'}, 404
+
+        # Update the page
+        page.title = title
+        db.session.commit()
+
+        return {'message': 'Page updated successfully'}, 200
+
+    def delete(self, page_id):
+        # Delete an existing page
+        page = Page.query.get(page_id)
+        if page is None:
+            return {'message': 'Page not found'}, 404
+
+        # Delete the page
+        db.session.delete(page)
+        db.session.commit()
+
+        return {'message': 'Page deleted successfully'}, 200
 
 
 class BlockResource(Resource):
@@ -50,13 +141,50 @@ class BlockResource(Resource):
         
         # Validate and handle block creation logic
         
-        return {'message': 'Block created successfully'}, 201
+        # Create a new block object
+        new_block = Block(content=content, page_id=page_id)
+        
+        # Save the block to the database
+        db.session.add(new_block)
+        db.session.commit()
+        
+        return {'message': 'Block created successfully', 'block_id': new_block.id}, 201
+
+    def put(self, page_id, block_id):
+        # Update an existing block
+        data = request.get_json()
+        content = data.get('content')
+
+        # Validate and handle block update logic
+
+        block = Block.query.filter_by(id=block_id, page_id=page_id).first()
+        if block is None:
+            return {'message': 'Block not found'}, 404
+
+        # Update the block
+        block.content = content
+        db.session.commit()
+
+        return {'message': 'Block updated successfully'}, 200
+
+    def delete(self, page_id, block_id):
+        # Delete an existing block
+        block = Block.query.filter_by(id=block_id, page_id=page_id).first()
+        if block is None:
+            return {'message': 'Block not found'}, 404
+
+        # Delete the block
+        db.session.delete(block)
+        db.session.commit()
+
+        return {'message': 'Block deleted successfully'}, 200
 
 
 # Add the resource routes
-api.add_resource(UserResource, "/users")
+api.add_resource(UserResource, "/users", "/users/login")
+api.add_resource(SignUpResource, "/users/signup")
 api.add_resource(PageResource, "/pages", "/pages/<int:page_id>")
 api.add_resource(BlockResource, "/pages/<int:page_id>/blocks")
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(port=5555, debug=True)

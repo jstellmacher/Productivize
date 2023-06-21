@@ -1,0 +1,12 @@
+{
+  "dependencies": {
+    "autoprefixer": "^9.8.8",
+    "postcss": "^7.0.39",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.13.0"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.3.2"
+  }
+}
