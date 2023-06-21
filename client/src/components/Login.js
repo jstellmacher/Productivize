@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
-
-
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -87,7 +85,16 @@ const Login = () => {
                 Log in
               </button>
             </div>
+
+            <div className="mt-2 text-center">
+              <p className="text-sm text-gray-600">
+                <Link to="/forgot" className="font-medium text-indigo-600 hover:text-indigo-500">
+                  Forgot Password/Username?
+                </Link>
+              </p>
+            </div>
           </form>
+
           <div className="mt-4 text-center">
             <p className="text-sm text-gray-600">
               Don't have an account?{' '}
@@ -102,14 +109,6 @@ const Login = () => {
   );
 };
 
-const SignUp = () => {
-  // Similar logic as the Login component for handling sign-up functionality
 
-  return (
-    <div className="min-h-screen bg-gray-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      {/* Sign-up form JSX */}
-    </div>
-  );
-};
 
-export { Login, SignUp };
+export { Login };
