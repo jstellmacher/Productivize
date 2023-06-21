@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import Nav from './Nav';
 import Home from './Home';
 import Pages from './Pages';
-import { Login } from './Login';
+import Login from './Login'; // Update the import statement here
 import Signup from './Signup';
 import '../index.css'
 

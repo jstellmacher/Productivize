@@ -3,13 +3,23 @@ import { useHistory } from "react-router-dom";
 import { RiArrowGoBackLine } from "react-icons/ri";
 
 const Signup = () => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [email, setEmail] = useState("");
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
+  const [formData, setFormData] = useState({
+    username: "",
+    password: "",
+    email: "",
+    firstName: "",
+    lastName: "",
+  });
   const [errorMessage, setErrorMessage] = useState("");
   const history = useHistory();
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      [name]: value,
+    }));
+  };
 
   const handleSignup = async (e) => {
     e.preventDefault();
@@ -20,13 +30,13 @@ const Signup = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ username, password, email, firstName, lastName }),
+        body: JSON.stringify(formData),
         credentials: "include",
       });
 
       if (response.ok) {
         // Signup successful
-        // Perform any necessary actions (e.g., redirect, update state)
+        history.push("/"); // Redirect to the home page or desired route
       } else {
         // Signup failed
         const data = await response.json();
@@ -61,7 +71,6 @@ const Signup = () => {
               <p className="mb-4 text-red-500 text-sm">{errorMessage}</p>
             )}
             <form className="space-y-6" onSubmit={handleSignup}>
-            
               {/* Signup form fields */}
               <div>
                 <label
@@ -75,8 +84,9 @@ const Signup = () => {
                     type="text"
                     id="username"
                     autoComplete="username"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
+                    name="username"
+                    value={formData.username}
+                    onChange={handleInputChange}
                     required
                     className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                   />
@@ -95,8 +105,9 @@ const Signup = () => {
                     type="password"
                     id="password"
                     autoComplete="new-password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    name="password"
+                    value={formData.password}
+                    onChange={handleInputChange}
                     required
                     className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                   />
@@ -115,8 +126,9 @@ const Signup = () => {
                     type="email"
                     id="email"
                     autoComplete="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    name="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
                     required
                     className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                   />
@@ -135,8 +147,9 @@ const Signup = () => {
                     type="text"
                     id="firstName"
                     autoComplete="given-name"
-                    value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
+                    name="firstName"
+                    value={formData.firstName}
+                    onChange={handleInputChange}
                     required
                     className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                   />
@@ -155,8 +168,9 @@ const Signup = () => {
                     type="text"
                     id="lastName"
                     autoComplete="family-name"
-                    value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
+                    name="lastName"
+                    value={formData.lastName}
+                    onChange={handleInputChange}
                     required
                     className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                   />

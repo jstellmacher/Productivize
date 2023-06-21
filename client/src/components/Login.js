@@ -2,9 +2,21 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 const Login = () => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
+  const [formData, setFormData] = useState({
+    username: '',
+    password: '',
+    errorMessage: '',
+    loggedInUsername: '',
+  });
+
+  const { username, password, errorMessage, loggedInUsername } = formData;
+
+  const handleInputChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -16,32 +28,38 @@ const Login = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ username, password }),
-        credentials: 'include',
       });
 
       if (response.ok) {
         // Login successful
-        // Perform any necessary actions (e.g., redirect, update state)
+        const { username } = await response.json();
+        setFormData({ ...formData, loggedInUsername: username });
       } else {
         // Login failed
-        const data = await response.json();
-        setErrorMessage(data.message);
+        const { message } = await response.json();
+        setFormData({ ...formData, errorMessage: message });
       }
     } catch (error) {
       console.error('Error logging in:', error);
-      setErrorMessage('An error occurred while logging in. Please try again.');
+      setFormData({
+        ...formData,
+        errorMessage: 'An error occurred while logging in. Please try again.',
+      });
     }
   };
 
   return (
     <div className="min-h-screen bg-milky flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="flex justify-center bg-gray-100 rounded-md sm:mx-auto sm:w-full sm:max-w-md">
-        <h2 className="m-4 text-center text-3xl font-extrabold text-gray-900">Log in to your account</h2>
+        <h2 className="m-4 text-center text-3xl font-extrabold text-gray-900">Log In To Be Productive!</h2>
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
           {errorMessage && <p className="mb-4 text-red-500 text-sm">{errorMessage}</p>}
+          {loggedInUsername && (
+            <p className="mb-4 text-green-500 text-sm">Logged in successfully as {loggedInUsername}</p>
+          )}
           <form className="space-y-6" onSubmit={handleLogin}>
             <div>
               <label htmlFor="username" className="block text-sm font-medium text-gray-700">
@@ -52,8 +70,9 @@ const Login = () => {
                   type="text"
                   id="username"
                   autoComplete="username"
+                  name="username"
                   value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  onChange={handleInputChange}
                   required
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                 />
@@ -69,8 +88,9 @@ const Login = () => {
                   type="password"
                   id="password"
                   autoComplete="current-password"
+                  name="password"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={handleInputChange}
                   required
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                 />
@@ -109,6 +129,4 @@ const Login = () => {
   );
 };
 
-
-
-export { Login };
+export default Login;

@@ -27,7 +27,7 @@ class UserResource(Resource):
         if user and user.check_password(password):
             # Login successful
             session['user_id'] = user.id
-            return {'message': 'Login successful'}, 200
+            return user.to_dict(), 200
         else:
             # Login failed
             return {'message': 'Invalid username or password'}, 401
@@ -37,19 +37,18 @@ class UserResource(Resource):
         return {"message": "Logout successful! Have a great day!"}, 200
 
     def get(self):
-        # Get the authenticated user's ID from the session
-        user_id = session.get('user_id')
-        if user_id:
-            # Retrieve the user object
+        # Check the authentication status
+        if 'user_id' in session:
+            # User is authenticated
+            user_id = session['user_id']
             user = User.query.get(user_id)
             if user:
                 # Access the user's pages relationship
                 user_pages = user.pages
                 return {'pages': [page.serialize() for page in user_pages]}, 200
-            else:
-                return {'message': 'User not found'}, 404
-        else:
-            return {'message': 'Not authenticated'}, 401
+        return {'message': 'Not authenticated'}, 401
+
+
 
 
 class SignUpResource(Resource):
@@ -63,13 +62,15 @@ class SignUpResource(Resource):
         # Validate and handle user sign-up logic
         
         # Create a new user object
-        new_user = User(username=username, password=password, email=email)
+        new_user = User(username=username,email=email)
+        new_user.password_hash = password
         
         # Save the user to the database
         db.session.add(new_user)
         db.session.commit()
+        session['user_id'] = new_user.id
         
-        return {'message': 'User signed up successfully'}, 201
+        return new_user.to_dict(), 201
 
 
 class PageResource(Resource):
