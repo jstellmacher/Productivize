@@ -182,7 +182,7 @@ class BlockResource(Resource):
 
 # Add the resource routes
 api.add_resource(UserResource, "/users", "/users/login")
-api.add_resource(SignUpResource, "/users/signup")
+api.add_resource(SignUpResource, "/signup")
 api.add_resource(PageResource, "/pages", "/pages/<int:page_id>")
 api.add_resource(BlockResource, "/pages/<int:page_id>/blocks")
 

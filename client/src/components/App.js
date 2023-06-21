@@ -4,6 +4,7 @@ import Nav from './Nav';
 import Home from './Home';
 import Pages from './Pages';
 import { Login } from './Login';
+import SignUp from './Signup';
 import '../index.css'
 
 const App = () => {
@@ -54,21 +55,25 @@ const App = () => {
         {isLoggedIn && <Nav isLoggedIn={isLoggedIn} onLogout={handleLogout} />}
 
         <div className="container mx-auto px-4">
-          <Switch>
-            <Route exact path="/">
+        <Switch>
+          <Route exact path="/">
+            <Home isLoggedIn={isLoggedIn} />
+          </Route>
+          <Route path="/home">
+            {isLoggedIn ? (
+              <Pages isLoggedIn={isLoggedIn} />
+            ) : (
               <Home isLoggedIn={isLoggedIn} />
-            </Route>
-            <Route path="/home">
-              {isLoggedIn ? (
-                <Pages isLoggedIn={isLoggedIn} />
-              ) : (
-                <Home isLoggedIn={isLoggedIn} />
-              )}
-            </Route>
-            <Route path="/login">
-              <Login />
-            </Route>
-          </Switch>
+            )}
+          </Route>
+          <Route path="/login">
+            <Login />
+          </Route>
+          <Route path="/signup">
+            <SignUp />
+          </Route>
+        </Switch>
+
         </div>
       </div>
     </Router>

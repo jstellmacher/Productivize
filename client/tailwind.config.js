@@ -13,7 +13,13 @@ module.exports = {
     ],
   },
   theme: {
-    extend: {},
+    extend: {
+      backgroundImage: {
+        
+        'milky': "url('../public/milky_way.jpg')"
+      
+      }
+    },
   },
   plugins: [],
 };
