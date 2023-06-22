@@ -1,7 +1,7 @@
-from flask import request, session
+from flask import request, session, jsonify
 from flask_restful import Resource
 from config import app, api, db
-from models import User, Page, Block
+from models import User, Page, Block, TextBlock, HeadingBlock, ImageBlock
 
 
 class UserResource(Resource):
@@ -50,7 +50,6 @@ class UserResource(Resource):
 
 
 
-
 class SignUpResource(Resource):
     def post(self):
         # Sign up a new user
@@ -62,7 +61,7 @@ class SignUpResource(Resource):
         # Validate and handle user sign-up logic
         
         # Create a new user object
-        new_user = User(username=username,email=email)
+        new_user = User(username=username, email=email)
         new_user.password_hash = password
         
         # Save the user to the database
@@ -193,11 +192,23 @@ class BlockResource(Resource):
         return {'message': 'Block deleted successfully'}, 200
 
 
+class UsernameResource(Resource):
+    def get(self):
+        user_id = request.args.get('user_id')
+        user = User.query.get(user_id)
+        
+        if user:
+            return jsonify({'username': user.username})
+        else:
+            return jsonify({'error': 'User not found'})
+
+
 # Add the resource routes
-api.add_resource(UserResource, "/users", "/users/login")
+api.add_resource(UserResource, "/users", "/users/login", "/users/logout")  # Add "/users/logout" endpoint
 api.add_resource(SignUpResource, "/signup")
 api.add_resource(PageResource, "/pages", "/pages/<int:page_id>")
 api.add_resource(BlockResource, "/pages/<int:page_id>/blocks")
+api.add_resource(UsernameResource, "/username")
 
 if __name__ == "__main__":
     app.run(port=5555, debug=True)

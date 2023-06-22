@@ -41,5 +41,110 @@ class Block(db.Model, SerializerMixin):
 
     id = db.Column(db.Integer, primary_key=True)
     type = db.Column(db.String(100), nullable=False)  # Add a type field to identify the block type
+    title = db.Column(db.String(100), nullable=False)  # Add a title field for the block
     content = db.Column(db.Text, nullable=False)
     page_id = db.Column(db.Integer, db.ForeignKey('pages.id'), nullable=False)
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'block',
+        'polymorphic_on': type
+    }
+
+
+class TextBlock(Block):
+    __tablename__ = 'text_blocks'
+
+    id = db.Column(db.Integer, db.ForeignKey('blocks.id'), primary_key=True)
+    __mapper_args__ = {
+        'polymorphic_identity': 'text_block'
+    }
+
+
+class HeadingBlock(Block):
+    __tablename__ = 'heading_blocks'
+
+    id = db.Column(db.Integer, db.ForeignKey('blocks.id'), primary_key=True)
+    __mapper_args__ = {
+        'polymorphic_identity': 'heading_block'
+    }
+
+
+class ImageBlock(Block):
+    __tablename__ = 'image_blocks'
+
+    id = db.Column(db.Integer, db.ForeignKey('blocks.id'), primary_key=True)
+    __mapper_args__ = {
+        'polymorphic_identity': 'image_block'
+    }
+
+
+class VideoBlock(Block):
+    __tablename__ = 'video_blocks'
+
+    id = db.Column(db.Integer, db.ForeignKey('blocks.id'), primary_key=True)
+    __mapper_args__ = {
+        'polymorphic_identity': 'video_block'
+    }
+
+
+class BulletedListBlock(Block):
+    __tablename__ = 'bulleted_list_blocks'
+
+    id = db.Column(db.Integer, db.ForeignKey('blocks.id'), primary_key=True)
+    __mapper_args__ = {
+        'polymorphic_identity': 'bulleted_list_block'
+    }
+
+
+class NumberedListBlock(Block):
+    __tablename__ = 'numbered_list_blocks'
+
+    id = db.Column(db.Integer, db.ForeignKey('blocks.id'), primary_key=True)
+    __mapper_args__ = {
+        'polymorphic_identity': 'numbered_list_block'
+    }
+
+
+class ToggleBlock(Block):
+    __tablename__ = 'toggle_blocks'
+
+    id = db.Column(db.Integer, db.ForeignKey('blocks.id'), primary_key=True)
+    __mapper_args__ = {
+        'polymorphic_identity': 'toggle_block'
+    }
+
+
+class QuoteBlock(Block):
+    __tablename__ = 'quote_blocks'
+
+    id = db.Column(db.Integer, db.ForeignKey('blocks.id'), primary_key=True)
+    __mapper_args__ = {
+        'polymorphic_identity': 'quote_block'
+    }
+
+
+class DividerBlock(Block):
+    __tablename__ = 'divider_blocks'
+
+    id = db.Column(db.Integer, db.ForeignKey('blocks.id'), primary_key=True)
+    __mapper_args__ = {
+        'polymorphic_identity': 'divider_block'
+    }
+
+
+class CalloutBlock(Block):
+    __tablename__ = 'callout_blocks'
+
+    id = db.Column(db.Integer, db.ForeignKey('blocks.id'), primary_key=True)
+    __mapper_args__ = {
+        'polymorphic_identity': 'callout_block'
+    }
+
+
+class CodeBlock(Block):
+    __tablename__ = 'code_blocks'
+
+    id = db.Column(db.Integer, db.ForeignKey('blocks.id'), primary_key=True)
+    __mapper_args__ = {
+        'polymorphic_identity': 'code_block'
+    }

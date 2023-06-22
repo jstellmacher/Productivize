@@ -7,8 +7,9 @@ from random import randint, choice as rc
 from faker import Faker
 
 # Local imports
-from app import app
-from models import db, User, Page, Block
+from app import app, db
+from models import User, Page, Block, TextBlock, HeadingBlock, ImageBlock, VideoBlock, BulletedListBlock, \
+    NumberedListBlock, ToggleBlock, QuoteBlock, DividerBlock, CalloutBlock, CodeBlock
 
 if __name__ == '__main__':
     fake = Faker()
@@ -28,7 +29,7 @@ if __name__ == '__main__':
                 "email": fake.email()
             }
             user = User(**user_data)
-            user.password_hash = password  # Set the password hash
+            user.password_hash = password  # Set the password hash using the updated method
             db.session.add(user)
 
         # Example: Creating sample pages associated with users
@@ -36,7 +37,7 @@ if __name__ == '__main__':
         for _ in range(10):
             page_data = {
                 "title": fake.sentence(),
-                "user": rc(users)
+                "user_id": rc(users).id  # Use user_id to assign the user relationship
             }
             page = Page(**page_data)
             db.session.add(page)
@@ -45,13 +46,43 @@ if __name__ == '__main__':
         pages = Page.query.all()
         for page in pages:
             for _ in range(randint(1, 5)):
-                block_type = rc(["text", "image", "video"])  # Choose a random block type
+                block_type = rc(["text_block", "heading_block", "image_block", "video_block",
+                                 "bulleted_list_block", "numbered_list_block", "toggle_block",
+                                 "quote_block", "divider_block", "callout_block", "code_block"])  # Choose a random block type
                 block_data = {
                     "type": block_type,
+                    "title": fake.sentence(),
                     "content": fake.paragraph(),
-                    "page": page
+                    "page_id": page.id  # Use page_id to assign the page relationship
                 }
-                block = Block(**block_data)
+
+                # Create a block based on its type
+                if block_type == "text_block":
+                    block = TextBlock(**block_data)
+                elif block_type == "heading_block":
+                    block = HeadingBlock(**block_data)
+                elif block_type == "image_block":
+                    block = ImageBlock(**block_data)
+                elif block_type == "video_block":
+                    block = VideoBlock(**block_data)
+                elif block_type == "bulleted_list_block":
+                    block = BulletedListBlock(**block_data)
+                elif block_type == "numbered_list_block":
+                    block = NumberedListBlock(**block_data)
+                elif block_type == "toggle_block":
+                    block = ToggleBlock(**block_data)
+                elif block_type == "quote_block":
+                    block = QuoteBlock(**block_data)
+                elif block_type == "divider_block":
+                    block = DividerBlock(**block_data)
+                elif block_type == "callout_block":
+                    block = CalloutBlock(**block_data)
+                elif block_type == "code_block":
+                    block = CodeBlock(**block_data)
+                else:
+                    # Handle unsupported block types or add additional block types as needed
+                    continue
+
                 db.session.add(block)
 
         # Commit the changes to the database
