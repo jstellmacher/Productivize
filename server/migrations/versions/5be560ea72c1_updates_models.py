@@ -1,8 +1,8 @@
-"""create tables
+"""updates models
 
-Revision ID: 5637b7610bed
+Revision ID: 5be560ea72c1
 Revises: 
-Create Date: 2023-06-21 15:25:27.278029
+Create Date: 2023-06-21 22:39:02.908242
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '5637b7610bed'
+revision = '5be560ea72c1'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -36,6 +36,7 @@ def upgrade():
     )
     op.create_table('blocks',
     sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('type', sa.String(length=100), nullable=False),
     sa.Column('content', sa.Text(), nullable=False),
     sa.Column('page_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['page_id'], ['pages.id'], name=op.f('fk_blocks_page_id_pages')),

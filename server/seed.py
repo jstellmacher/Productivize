@@ -22,31 +22,38 @@ if __name__ == '__main__':
         # Seed code goes here!
         # Example: Creating sample users
         for _ in range(5):
-            user = User(
-                username=fake.user_name(),
-                password=fake.password(),
-                email=fake.email()
-            )
+            password = fake.password()
+            user_data = {
+                "username": fake.user_name(),
+                "email": fake.email()
+            }
+            user = User(**user_data)
+            user.password_hash = password  # Set the password hash
             db.session.add(user)
 
         # Example: Creating sample pages associated with users
         users = User.query.all()
         for _ in range(10):
-            page = Page(
-                title=fake.sentence(),
-                user=rc(users)
-            )
+            page_data = {
+                "title": fake.sentence(),
+                "user": rc(users)
+            }
+            page = Page(**page_data)
             db.session.add(page)
 
+        # Example: Creating sample blocks associated with pages
         # Example: Creating sample blocks associated with pages
         pages = Page.query.all()
         for page in pages:
             for _ in range(randint(1, 5)):
-                block = Block(
-                    content=fake.paragraph(),
-                    page=page
-                )
+                block_data = {
+                    "type": "some_type",  # Provide a value for the 'type' attribute
+                    "content": fake.paragraph(),
+                    "page": page
+                }
+                block = Block(**block_data)
                 db.session.add(block)
+
 
         # Commit the changes to the database
         db.session.commit()

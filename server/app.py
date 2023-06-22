@@ -138,18 +138,30 @@ class BlockResource(Resource):
     def post(self, page_id):
         # Create a new block within a page
         data = request.get_json()
+        block_type = data.get('type')
         content = data.get('content')
-        
+
         # Validate and handle block creation logic
-        
-        # Create a new block object
-        new_block = Block(content=content, page_id=page_id)
-        
-        # Save the block to the database
-        db.session.add(new_block)
-        db.session.commit()
-        
-        return {'message': 'Block created successfully', 'block_id': new_block.id}, 201
+
+        block = None
+        if block_type == 'text':
+            block = TextBlock(content=content)
+        elif block_type == 'heading':
+            block = HeadingBlock(content=content)
+        elif block_type == 'image':
+            block = ImageBlock(content=content)
+
+        if block:
+            page = Page.query.get(page_id)
+            if page is None:
+                return {'message': 'Page not found'}, 404
+
+            page.blocks.append(block)
+            db.session.commit()
+
+            return {'message': 'Block created successfully', 'block_id': block.id}, 201
+        else:
+            return {'message': 'Invalid block type'}, 400
 
     def put(self, page_id, block_id):
         # Update an existing block
