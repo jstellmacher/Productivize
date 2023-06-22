@@ -42,18 +42,17 @@ if __name__ == '__main__':
             db.session.add(page)
 
         # Example: Creating sample blocks associated with pages
-        # Example: Creating sample blocks associated with pages
         pages = Page.query.all()
         for page in pages:
             for _ in range(randint(1, 5)):
+                block_type = rc(["text", "image", "video"])  # Choose a random block type
                 block_data = {
-                    "type": "some_type",  # Provide a value for the 'type' attribute
+                    "type": block_type,
                     "content": fake.paragraph(),
                     "page": page
                 }
                 block = Block(**block_data)
                 db.session.add(block)
-
 
         # Commit the changes to the database
         db.session.commit()

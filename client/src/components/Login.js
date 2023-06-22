@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -9,13 +9,13 @@ const Login = () => {
     loggedInUsername: '',
   });
 
-  const { username, password, errorMessage, loggedInUsername } = formData;
+  const history = useHistory();
 
   const handleInputChange = (e) => {
-    setFormData({
-      ...formData,
+    setFormData((prevData) => ({
+      ...prevData,
       [e.target.name]: e.target.value,
-    });
+    }));
   };
 
   const handleLogin = async (e) => {
@@ -27,26 +27,34 @@ const Login = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ username: formData.username, password: formData.password }),
       });
 
       if (response.ok) {
         // Login successful
         const { username } = await response.json();
-        setFormData({ ...formData, loggedInUsername: username });
+        setFormData((prevData) => ({ ...prevData, loggedInUsername: username }));
+        setFormData((prevData) => ({
+          ...prevData,
+          username: '',
+          password: '',
+        }));
+        history.push('/history'); // Redirect to history route
       } else {
         // Login failed
         const { message } = await response.json();
-        setFormData({ ...formData, errorMessage: message });
+        setFormData((prevData) => ({ ...prevData, errorMessage: message }));
       }
     } catch (error) {
       console.error('Error logging in:', error);
-      setFormData({
-        ...formData,
+      setFormData((prevData) => ({
+        ...prevData,
         errorMessage: 'An error occurred while logging in. Please try again.',
-      });
+      }));
     }
   };
+
+  const { username, password, errorMessage, loggedInUsername } = formData;
 
   return (
     <div className="min-h-screen bg-milky flex flex-col justify-center py-12 sm:px-6 lg:px-8">
