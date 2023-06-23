@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Link, useHistory } from 'react-router-dom';
+import { AuthContext } from '../context/Auth';
 
 const Login = () => {
+  const { login } = useContext(AuthContext);
+
   const [formData, setFormData] = useState({
     username: '',
     password: '',
-    errorMessage: '',
-    loggedInUsername: '',
+    errorMessage: ''
   });
 
   const history = useHistory();
@@ -32,14 +34,16 @@ const Login = () => {
 
       if (response.ok) {
         // Login successful
-        const { username } = await response.json();
-        setFormData((prevData) => ({ ...prevData, loggedInUsername: username }));
+        login(); // Set the logged-in status
         setFormData((prevData) => ({
           ...prevData,
           username: '',
           password: '',
+          errorMessage: ''
         }));
-        history.push('/history'); // Redirect to history route
+
+        // Redirect to user's specific dashboard
+        history.replace('/dash'); // Replace '/dash' with the appropriate URL for the user's dashboard
       } else {
         // Login failed
         const { message } = await response.json();
@@ -54,7 +58,7 @@ const Login = () => {
     }
   };
 
-  const { username, password, errorMessage, loggedInUsername } = formData;
+  const { username, password, errorMessage } = formData;
 
   return (
     <div className="min-h-screen bg-milky flex flex-col justify-center py-12 sm:px-6 lg:px-8">
@@ -65,9 +69,6 @@ const Login = () => {
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
           {errorMessage && <p className="mb-4 text-red-500 text-sm">{errorMessage}</p>}
-          {loggedInUsername && (
-            <p className="mb-4 text-green-500 text-sm">Logged in successfully as {loggedInUsername}</p>
-          )}
           <form className="space-y-6" onSubmit={handleLogin}>
             <div>
               <label htmlFor="username" className="block text-sm font-medium text-gray-700">
