@@ -1,11 +1,11 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { Link } from 'react-router-dom';
-import { UsersContext } from '../context/Users';
+import { AppContext } from '../context/AppC';
 import { TiPlus } from 'react-icons/ti'; // Import the TiPlus icon from react-icons
 
 const Dash = () => {
   const [pages, setPages] = useState([]);
-  const { user } = useContext(UsersContext);
+  const { user } = useContext(AppContext);
 
   useEffect(() => {
     const fetchPages = async () => {

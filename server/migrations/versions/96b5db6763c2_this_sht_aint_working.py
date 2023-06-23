@@ -1,8 +1,8 @@
-"""updates models.py
+"""this sht aint working
 
-Revision ID: 85cf9eebb783
+Revision ID: 96b5db6763c2
 Revises: 
-Create Date: 2023-06-22 16:29:36.635739
+Create Date: 2023-06-22 22:12:48.538301
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '85cf9eebb783'
+revision = '96b5db6763c2'
 down_revision = None
 branch_labels = None
 depends_on = None

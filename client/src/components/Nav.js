@@ -1,10 +1,10 @@
 import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { RiHome4Line, RiPagesLine, RiLogoutCircleLine, RiLoginCircleLine } from 'react-icons/ri';
-import { UsersContext } from '../context/Users';
+import { AppContext } from '../context/AppC';
 
 const Nav = () => {
-  const { isLoggedIn, logout } = useContext(UsersContext);
+  const { user, logout } = useContext(AppContext);
 
   return (
     <nav className="bg-gray-800 py-4">
@@ -24,7 +24,7 @@ const Nav = () => {
                 <span>Pages</span>
               </Link>
             </li>
-            {isLoggedIn ? (
+            {user ? (
               <li>
                 <button
                   onClick={logout}

@@ -1,9 +1,9 @@
 import React, { useState, useContext } from 'react';
 import { Link, useHistory } from 'react-router-dom';
-import { AuthContext } from '../context/Auth';
+import { AppContext } from '../context/AppC';
 
 const Login = () => {
-  const { login } = useContext(AuthContext);
+  const { login } = useContext(AppContext);
 
   const [formData, setFormData] = useState({
     username: '',
@@ -61,7 +61,7 @@ const Login = () => {
   const { username, password, errorMessage } = formData;
 
   return (
-    <div className="min-h-screen bg-milky flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-milky bg-cover bg-center bg-no-repeat flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="flex justify-center bg-gray-100 rounded-md sm:mx-auto sm:w-full sm:max-w-md">
         <h2 className="m-4 text-center text-3xl font-extrabold text-gray-900">Log In To Be Productive!</h2>
       </div>

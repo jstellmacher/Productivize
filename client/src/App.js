@@ -1,24 +1,28 @@
-import React, { useEffect, useContext } from 'react';
-import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-dom';
-import Nav from './components/Nav';
-import Home from './components/Home';
-import Pages from './components/Pages';
-import Login from './components/Login';
-import Signup from './components/Signup';
-import Dash from './components/Dash';
-import { UsersProvider, UsersContext } from './context/Users';
-import { AuthProvider, AuthContext } from './context/Auth';
-import './index.css';
+import React, { useContext, useEffect } from "react";
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Redirect,
+} from "react-router-dom";
+import Nav from "./components/Nav";
+import Landing from "./components/Landing";
+import Pages from "./components/Pages";
+import Login from "./components/Login";
+import Signup from "./components/Signup";
+import Dash from "./components/Dash";
+import { AppContext } from "./context/AppC";
+import "./index.css";
 
 const App = () => {
-  const { isLoggedIn, login, logout } = useContext(UsersContext);
+  const { user, login, logout } = useContext(AppContext);
 
   useEffect(() => {
     const checkAuthentication = async () => {
       try {
-        const response = await fetch('/users', {
-          method: 'GET',
-          credentials: 'include',
+        const response = await fetch("/users", {
+          method: "GET",
+          credentials: "include",
         });
 
         if (response.ok) {
@@ -28,7 +32,7 @@ const App = () => {
           logout(); // Clear the logged-in user
         }
       } catch (error) {
-        console.error('Error checking authentication:', error);
+        console.error("Error checking authentication:", error);
         logout(); // Clear the logged-in user
       }
     };
@@ -40,32 +44,32 @@ const App = () => {
     await logout();
   };
 
+  if (user === undefined) {
+    return <p>Loading...</p>;
+  }
+
   return (
     <Router>
       <div>
-        <UsersProvider>
-          <AuthProvider>
-            {isLoggedIn && <Nav onLogout={handleLogout} />}
+        {user && <Nav onLogout={handleLogout} />}
 
-            <div className="container mx-auto px-4">
-              <Switch>
-                <Route exact path="/">
-                  {isLoggedIn ? <Redirect to="/dash" /> : <Home />}
-                </Route>
-                <Route path="/home">{isLoggedIn ? <Pages /> : <Home />}</Route>
-                <Route path="/dash">
-                  {isLoggedIn ? <Dash /> : <Redirect to="/login" />}
-                </Route>
-                <Route path="/login">
-                  {isLoggedIn ? <Redirect to="/dash" /> : <Login />}
-                </Route>
-                <Route path="/signup">
-                  {isLoggedIn ? <Redirect to="/dash" /> : <Signup />}
-                </Route>
-              </Switch>
-            </div>
-          </AuthProvider>
-        </UsersProvider>
+        <div className="container mx-auto px-4">
+          <Switch>
+            <Route exact path="/">
+              {user ? <Redirect to="/dash" /> : <Landing />}
+            </Route>
+            <Route path="/landing" component={Pages} />
+            <Route path="/dash">
+              {user ? <Dash /> : <Redirect to="/login" />}
+            </Route>
+            <Route path="/login">
+              {user ? <Redirect to="/dash" /> : <Login />}
+            </Route>
+            <Route path="/signup">
+              {user ? <Redirect to="/dash" /> : <Signup />}
+            </Route>
+          </Switch>
+        </div>
       </div>
     </Router>
   );

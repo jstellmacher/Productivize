@@ -3,20 +3,21 @@ from flask_restful import Resource
 from config import app, api, db
 from models import User, Page, Block, TextBlock, HeadingBlock, ImageBlock
 
-
 class UserResource(Resource):
-    def post(self):
-        # Create a new user
-        data = request.get_json()
-        username = data.get('username')
-        password = data.get('password')
-        email = data.get('email')
-        
-        # Validate and handle user creation logic
-        
-        return {'message': 'User created successfully'}, 201
+    def get(self):
+        # Retrieve user information based on the session
+        user_id = session.get('user_id')
+        if user_id:
+            user = User.query.get(user_id)
+            if user:
+                return user.to_dict(), 200
 
-    def login(self):
+        return {'message': 'User not authenticated'}, 401
+
+api.add_resource(UserResource, "/users")  # Update the route to "/users"
+
+class LoginResource(Resource):
+    def post(self):
         # Handle user login
         data = request.get_json()
         username = data.get('username')
@@ -32,22 +33,11 @@ class UserResource(Resource):
             # Login failed
             return {'message': 'Invalid username or password'}, 401
 
-    def logout(self):
+
+class LogoutResource(Resource):
+    def post(self):
         session.clear()
         return {"message": "Logout successful! Have a great day!"}, 200
-
-    def get(self):
-        # Check the authentication status
-        if 'user_id' in session:
-            # User is authenticated
-            user_id = session['user_id']
-            user = User.query.get(user_id)
-            if user:
-                # Access the user's pages relationship
-                user_pages = user.pages
-                return {'pages': [page.serialize() for page in user_pages]}, 200
-        return {'message': 'Not authenticated'}, 401
-
 
 
 class SignUpResource(Resource):
@@ -192,23 +182,24 @@ class BlockResource(Resource):
         return {'message': 'Block deleted successfully'}, 200
 
 
-class UsernameResource(Resource):
-    def get(self):
-        user_id = request.args.get('user_id')
-        user = User.query.get(user_id)
+# class UsernameResource(Resource):
+#     def get(self):
+#         user_id = request.args.get('user_id')
+#         user = User.query.get(user_id)
         
-        if user:
-            return jsonify({'username': user.username})
-        else:
-            return jsonify({'error': 'User not found'})
+#         if user:
+#             return jsonify({'username': user.username})
+#         else:
+#             return jsonify({'error': 'User not found'})
 
 
 # Add the resource routes
-api.add_resource(UserResource, "/users", "/users/login", "/users/logout")  # Add "/users/logout" endpoint
+api.add_resource(LoginResource, "/users/login")  # Add "/users/login" endpoint
+api.add_resource(LogoutResource, "/users/logout")  # Add "/users/logout" endpoint
 api.add_resource(SignUpResource, "/signup")
 api.add_resource(PageResource, "/pages", "/pages/<int:page_id>")
 api.add_resource(BlockResource, "/pages/<int:page_id>/blocks")
-api.add_resource(UsernameResource, "/username")
+# api.add_resource(UsernameResource, "/username")
 
 if __name__ == "__main__":
     app.run(port=5555, debug=True)

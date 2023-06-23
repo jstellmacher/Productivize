@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { useHistory } from "react-router-dom";
 import { RiArrowGoBackLine } from "react-icons/ri";
+import { AppContext } from "../context/AppC";
 
 const Signup = () => {
+  const { signup } = useContext(AppContext);
   const [formData, setFormData] = useState({
     username: "",
     password: "",
@@ -25,14 +27,7 @@ const Signup = () => {
     e.preventDefault();
 
     try {
-      const response = await fetch("/signup", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-        credentials: "include",
-      });
+      const response = await signup(formData);
 
       if (response.ok) {
         // Signup successful
@@ -93,6 +88,7 @@ const Signup = () => {
                 </div>
               </div>
 
+
               <div>
                 <label
                   htmlFor="password"
@@ -113,6 +109,7 @@ const Signup = () => {
                   />
                 </div>
               </div>
+
 
               <div>
                 <label
@@ -135,6 +132,7 @@ const Signup = () => {
                 </div>
               </div>
 
+
               <div>
                 <label
                   htmlFor="firstName"
@@ -155,6 +153,7 @@ const Signup = () => {
                   />
                 </div>
               </div>
+
 
               <div>
                 <label
@@ -177,6 +176,7 @@ const Signup = () => {
                 </div>
               </div>
 
+
               <div>
                 <button
                   type="submit"
@@ -192,5 +192,6 @@ const Signup = () => {
     </div>
   );
 };
+
 
 export default Signup;
