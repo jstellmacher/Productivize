@@ -27,7 +27,11 @@ class LoginResource(Resource):
         user = User.query.filter_by(username=username).first()
         if user and user.check_password(password):
             # Login successful
+            session.clear()
             session['user_id'] = user.id
+
+            
+            # db.session.add(session) 
             return user.to_dict(), 200
         else:
             # Login failed
