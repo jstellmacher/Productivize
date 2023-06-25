@@ -15,7 +15,9 @@ class User(db.Model, SerializerMixin):
     serialize_rules = ("-pages._password_hash", "-pages.blocks._password_hash")
 
     def check_password(self, password):
-        return bcrypt.check_password_hash(self.password_hash, password.encode('utf-8'))
+        print('self._password_hash:', self._password_hash)
+        print('password:', password)
+        return bcrypt.check_password_hash(self._password_hash, password.encode('utf-8'))
 
     @hybrid_property
     def password_hash(self):

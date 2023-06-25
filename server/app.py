@@ -1,25 +1,59 @@
-from flask import request, session, jsonify
+from flask import request, session, jsonify, abort
 from flask_restful import Resource
 from config import app, api, db
 from models import User, Page, Block, TextBlock, HeadingBlock, ImageBlock
 
+
 class UserResource(Resource):
+    def post(self):
+        # User authentication
+        data = request.get_json()
+        username = data.get('username')
+        password = data.get('password')
+
+        print('Received data:', data)
+        print('Username:', username)
+        print('Password:', password)
+
+        user = User.query.filter_by(username=username).first()
+
+        print('User:', user)
+
+        if user and user.check_password(password):
+            # Authentication successful
+            session['user_id'] = user.id
+            return {'message': 'Authentication successful'}, 200
+        else:
+            # Authentication failed
+            return {'message': 'Invalid username or password'}, 401
+
+
+
+    def delete(self):
+        # User logout
+        session.pop('user_id', None)
+        return {'message': 'Logout successful'}, 200
+
     def get(self):
-        # Retrieve user information based on the session
+        # Check user session
         user_id = session.get('user_id')
         if user_id:
             user = User.query.get(user_id)
             if user:
-                return user.to_dict(), 200
+                return {'message': 'User session active'}, 200
 
         return {'message': 'User not authenticated'}, 401
 
-api.add_resource(UserResource, "/users")  # Update the route to "/users"
 
 class LoginResource(Resource):
     def post(self):
         # Handle user login
-        data = request.get_json()
+        data = request.get_json(force=True)  # Parse request data as JSON
+        print(data)
+
+        if not data:
+            return {'message': 'Invalid JSON data'}, 400
+
         username = data.get('username')
         password = data.get('password')
 
@@ -29,13 +63,11 @@ class LoginResource(Resource):
             # Login successful
             session.clear()
             session['user_id'] = user.id
-
-            
-            # db.session.add(session) 
             return user.to_dict(), 200
         else:
             # Login failed
             return {'message': 'Invalid username or password'}, 401
+
 
 
 class LogoutResource(Resource):
@@ -51,18 +83,18 @@ class SignUpResource(Resource):
         username = data.get('username')
         password = data.get('password')
         email = data.get('email')
-        
+
         # Validate and handle user sign-up logic
-        
+
         # Create a new user object
         new_user = User(username=username, email=email)
         new_user.password_hash = password
-        
+
         # Save the user to the database
         db.session.add(new_user)
         db.session.commit()
         session['user_id'] = new_user.id
-        
+
         return new_user.to_dict(), 201
 
 
@@ -85,16 +117,16 @@ class PageResource(Resource):
         # Create a new page
         data = request.get_json()
         title = data.get('title')
-        
+
         # Validate and handle page creation logic
-        
+
         # Create a new page object
         new_page = Page(title=title, user_id=session['user_id'])
-        
+
         # Save the page to the database
         db.session.add(new_page)
         db.session.commit()
-        
+
         return {'message': 'Page created successfully', 'page_id': new_page.id}, 201
 
     def put(self, page_id):
@@ -156,6 +188,7 @@ class BlockResource(Resource):
         else:
             return {'message': 'Invalid block type'}, 400
 
+
     def put(self, page_id, block_id):
         # Update an existing block
         data = request.get_json()
@@ -173,6 +206,7 @@ class BlockResource(Resource):
 
         return {'message': 'Block updated successfully'}, 200
 
+
     def delete(self, page_id, block_id):
         # Delete an existing block
         block = Block.query.filter_by(id=block_id, page_id=page_id).first()
@@ -186,24 +220,13 @@ class BlockResource(Resource):
         return {'message': 'Block deleted successfully'}, 200
 
 
-# class UsernameResource(Resource):
-#     def get(self):
-#         user_id = request.args.get('user_id')
-#         user = User.query.get(user_id)
-        
-#         if user:
-#             return jsonify({'username': user.username})
-#         else:
-#             return jsonify({'error': 'User not found'})
-
-
-# Add the resource routes
 api.add_resource(LoginResource, "/users/login")  # Add "/users/login" endpoint
 api.add_resource(LogoutResource, "/users/logout")  # Add "/users/logout" endpoint
-api.add_resource(SignUpResource, "/signup")
+api.add_resource(SignUpResource, "/users/signup")
+api.add_resource(UserResource, "/users")  # Update the route to "/users"
 api.add_resource(PageResource, "/pages", "/pages/<int:page_id>")
 api.add_resource(BlockResource, "/pages/<int:page_id>/blocks")
-# api.add_resource(UsernameResource, "/username")
+
 
 if __name__ == "__main__":
     app.run(port=5555, debug=True)

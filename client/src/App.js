@@ -50,7 +50,7 @@ const App = () => {
 
   return (
     <Router>
-      <div>
+      <div className="bg-gray-400">
         {user && <Nav onLogout={handleLogout} />}
 
         <div className="container mx-auto px-4">

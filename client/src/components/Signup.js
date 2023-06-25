@@ -48,7 +48,7 @@ const Signup = () => {
   };
 
   return (
-    <div className="min-h-screen bg-milky flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-milky bg-no-repeat bg-cover flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="bg-gray-100 py-8 px-4 shadow-xl rounded-lg mx-auto w-full sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl">
         <div className="flex justify-center mb-4">
           <button

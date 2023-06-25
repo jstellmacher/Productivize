@@ -1,0 +1,27 @@
+[
+    {
+      "imageSrc": "https://picsum.photos/201",
+      "title": "Organize Tasks",
+      "description": "Organize your tasks and projects efficiently to stay on top of your work and boost productivity.",
+      "link": "/task-organizer"
+    },
+    {
+      "imageSrc": "https://picsum.photos/202",
+      "title": "Collaborate in Real-time",
+      "description": "Collaborate with team members and work together in real-time to achieve your goals faster.",
+      "link": "/real-time-collaboration"
+    },
+    {
+      "imageSrc": "https://picsum.photos/203",
+      "title": "Customize Your Content",
+      "description": "Manage and customize your content with ease to create a personalized and organized workspace.",
+      "link": "/customize-content"
+    },
+    {
+      "imageSrc": "https://picsum.photos/204",
+      "title": "User-Friendly Interface",
+      "description": "Enjoy a user-friendly interface that simplifies your workflow and improves efficiency.",
+      "link": "/user-friendly-interface"
+    }
+  ]
+  

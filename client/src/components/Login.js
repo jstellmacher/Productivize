@@ -1,139 +1,57 @@
-import React, { useState, useContext } from 'react';
-import { Link, useHistory } from 'react-router-dom';
+import React, { useContext, useState } from 'react';
 import { AppContext } from '../context/AppC';
 
 const Login = () => {
   const { login } = useContext(AppContext);
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
 
-  const [formData, setFormData] = useState({
-    username: '',
-    password: '',
-    errorMessage: ''
-  });
-
-  const history = useHistory();
-
-  const handleInputChange = (e) => {
-    setFormData((prevData) => ({
-      ...prevData,
-      [e.target.name]: e.target.value,
-    }));
-  };
-
-  const handleLogin = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-
-    try {
-      const response = await fetch('/users/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username: formData.username, password: formData.password }),
-      });
-
-      if (response.ok) {
-        // Login successful
-        login(); // Set the logged-in status
-        setFormData((prevData) => ({
-          ...prevData,
-          username: '',
-          password: '',
-          errorMessage: ''
-        }));
-
-        // Redirect to user's specific dashboard
-        history.replace('/dash'); // Replace '/dash' with the appropriate URL for the user's dashboard
-      } else {
-        // Login failed
-        const { message } = await response.json();
-        setFormData((prevData) => ({ ...prevData, errorMessage: message }));
-      }
-    } catch (error) {
-      console.error('Error logging in:', error);
-      setFormData((prevData) => ({
-        ...prevData,
-        errorMessage: 'An error occurred while logging in. Please try again.',
-      }));
-    }
+    // Perform login logic using the login function passed from AppContext
+    login(username, password);
   };
-
-  const { username, password, errorMessage } = formData;
 
   return (
-    <div className="min-h-screen bg-milky bg-cover bg-center bg-no-repeat flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <div className="flex justify-center bg-gray-100 rounded-md sm:mx-auto sm:w-full sm:max-w-md">
-        <h2 className="m-4 text-center text-3xl font-extrabold text-gray-900">Log In To Be Productive!</h2>
-      </div>
-
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-          {errorMessage && <p className="mb-4 text-red-500 text-sm">{errorMessage}</p>}
-          <form className="space-y-6" onSubmit={handleLogin}>
-            <div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-700">
-                Username
-              </label>
-              <div className="mt-1">
-                <input
-                  type="text"
-                  id="username"
-                  autoComplete="username"
-                  name="username"
-                  value={username}
-                  onChange={handleInputChange}
-                  required
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                Password
-              </label>
-              <div className="mt-1">
-                <input
-                  type="password"
-                  id="password"
-                  autoComplete="current-password"
-                  name="password"
-                  value={password}
-                  onChange={handleInputChange}
-                  required
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                />
-              </div>
-            </div>
-
-            <div>
-              <button
-                type="submit"
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-              >
-                Log in
-              </button>
-            </div>
-
-            <div className="mt-2 text-center">
-              <p className="text-sm text-gray-600">
-                <Link to="/forgot" className="font-medium text-indigo-600 hover:text-indigo-500">
-                  Forgot Password/Username?
-                </Link>
-              </p>
-            </div>
-          </form>
-
-          <div className="mt-4 text-center">
-            <p className="text-sm text-gray-600">
-              Don't have an account?{' '}
-              <Link to="/signup" className="font-medium text-indigo-600 hover:text-indigo-500">
-                Sign up
-              </Link>
-            </p>
-          </div>
+    <div className="flex justify-center items-center h-screen">
+      <form onSubmit={handleSubmit} className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+        <div className="mb-4">
+          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="username">
+            Username
+          </label>
+          <input
+            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            id="username"
+            type="text"
+            placeholder="Enter your username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            required
+          />
         </div>
-      </div>
+        <div className="mb-6">
+          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password">
+            Password
+          </label>
+          <input
+            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
+            id="password"
+            type="password"
+            placeholder="Enter your password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+        </div>
+        <div className="flex items-center justify-between">
+          <button
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            type="submit"
+          >
+            Log In
+          </button>
+        </div>
+      </form>
     </div>
   );
 };
