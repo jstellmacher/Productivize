@@ -50,7 +50,7 @@ const App = () => {
 
   return (
     <Router>
-      <div className="bg-gray-400">
+      <div className="">
         {user && <Nav onLogout={handleLogout} />}
 
         <div className="container mx-auto px-4">
@@ -58,7 +58,7 @@ const App = () => {
             <Route exact path="/">
               {user ? <Redirect to="/dash" /> : <Landing />}
             </Route>
-            <Route path="/landing" component={Pages} />
+            <Route path="/dash" component={Pages} />
             <Route path="/dash">
               {user ? <Dash /> : <Redirect to="/login" />}
             </Route>

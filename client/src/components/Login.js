@@ -9,7 +9,11 @@ const Login = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     // Perform login logic using the login function passed from AppContext
-    login(username, password);
+    const userData = {
+      username: username,
+      password: password,
+    };
+    login(userData);
   };
 
   return (

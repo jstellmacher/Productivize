@@ -1,76 +1,108 @@
-import React, { useEffect, useState, useContext } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useContext, useState, useEffect } from 'react';
 import { AppContext } from '../context/AppC';
-import { TiPlus } from 'react-icons/ti'; // Import the TiPlus icon from react-icons
+import { TiPlus } from 'react-icons/ti';
+import { Redirect } from 'react-router-dom';
 
 const Dash = () => {
-  const [pages, setPages] = useState([]);
   const { user } = useContext(AppContext);
+  const [pages, setPages] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchPages = async () => {
-      try {
-        const response = await fetch('/pages');
-
-        if (response.ok) {
-          const data = await response.json();
-          setPages(data.pages);
-        } else {
-          console.error('Failed to fetch pages:', response);
-        }
-      } catch (error) {
-        console.error('Error fetching pages:', error);
-      }
-    };
-
-    fetchPages();
-  }, []);
-
-  // Shuffle the pages array to move the example page to the end when user has data
-  useEffect(() => {
-    if (pages.length > 0) {
-      const examplePageIndex = pages.findIndex(page => page.title === 'Example Page');
-      if (examplePageIndex !== -1) {
-        const examplePage = pages.splice(examplePageIndex, 1)[0];
-        setPages([...pages, examplePage]);
-      }
+    if (user) {
+      fetchUserPages(user.id);
     }
-  }, [pages]);
+  }, [user]);
+
+  const fetchUserPages = (userId) => {
+    // Make a fetch request to retrieve the user's pages based on the user ID
+    // Replace the URL and request options with your actual API endpoint
+    fetch(`/pages/${userId}`)
+      .then((response) => response.json())
+      .then((data) => {
+        setPages(data.pages);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.log(error);
+        setLoading(false);
+      });
+  };
+
+  const handleAddPage = () => {
+    // Make a fetch request to add a new page for the user
+    // Replace the URL and request options with your actual API endpoint
+    fetch(`/pages/${user.id}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({}),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        setPages([...pages, data.page]);
+      })
+      .catch((error) => console.log(error));
+  };
+
+
+  const handleClickPage = (pageId) => {
+    // Handle the click event for a specific page
+    // You can navigate to the page or perform any desired action
+    console.log(`Clicked on page with ID: ${pageId}`);
+  };
+
+  if (!user) {
+    // Redirect the user to the login page if not authenticated
+    return <Redirect to="/login" />;
+  }
+
+  
+};
+
+
+
+  const title = 'font-semibold';
 
   return (
-    <div>
-      <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-8">Dashboard</h1>
-        <div>
-          <h2>Welcome, {user ? user.username : ''}</h2>
-        </div>
-        <div className="border-solid border-2 border-sky-500 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {/* Button for adding new pages */}
-          <div className="bg-gray-100 rounded-lg p-4 shadow cursor-pointer border-2 border-gray-400">
-            <Link to="/new-page" className="flex justify-center items-center">
-              <TiPlus className="w-10 h-10 text-gray-400" />
-            </Link>
-          </div>
-
-          {pages.map((page) => (
-            <div
-              key={page.id}
-              className="bg-gray-100 rounded-lg p-4 shadow"
-            >
-              <h2 className="text-xl font-semibold mb-2">{page.title}</h2>
-              <p className="text-gray-700">{page.content}</p>
-            </div>
-          ))}
-        </div>
-
-        <div className="mt-8 text-center">
-          <p className="text-lg">Have fun exploring the dashboard!</p>
-          <p className="text-gray-500">More exciting features coming soon.</p>
-        </div>
+    <div className="space-y-5">
+      <h1 className="font-bold text-3xl mt-2">Dashboard</h1>
+      <div>
+        <h2 className={title}>Welcome, {user ? user.username : ''}</h2>
       </div>
 
-      <div className="bg-white rounded-lg shadow-lg my-8 mx-auto max-w-3xl h-1/2">
-        {/* Content of the div goes here */}
+      <div className="rounded-xl shadow-inner bg-gray-500 h-[80vh] p-2">
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          {loading ? (
+            <p>Loading...</p> // Display a loading state
+          ) : pages && Array.isArray(pages) && pages.length === 0 ? (
+            <p>No pages found.</p> // Display a message when no pages are available
+          ) : pages && Array.isArray(pages) ? (
+            pages.map((page) => (
+              <div key={page.id} className="bg-white rounded-lg shadow-md p-4">
+                <h3 className="text-lg font-semibold">{page.title}</h3>
+                {/* Additional page content */}
+              </div>
+            ))
+          ) : (
+            <p>Error loading pages.</p> // Display an error message if pages cannot be loaded
+          )}
+
+          <div
+            className="bg-white rounded-lg shadow-md p-4 cursor-pointer hover:bg-blue-300 hover:shadow-inner"
+            onClick={handleAddPage}
+          >
+            <div className="flex items-center justify-center h-24 ">
+              <TiPlus className="h-10 w-10 text-blue-500" />
+            </div>
+            <p className="text-center text-gray-500 mt-2">Add New Page</p>
+          </div>
+        </div>
+      </div>
+      <div>
+        <p>Have fun exploring the dashboard!</p>
+        <p>More exciting features coming soon.</p>
       </div>
     </div>
   );

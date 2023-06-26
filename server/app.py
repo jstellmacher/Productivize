@@ -12,8 +12,8 @@ class UserResource(Resource):
         password = data.get('password')
 
         print('Received data:', data)
-        print('Username:', username)
-        print('Password:', password)
+        # print('Username:', username)
+        # print('Password:', password)
 
         user = User.query.filter_by(username=username).first()
 
@@ -45,6 +45,7 @@ class UserResource(Resource):
         return {'message': 'User not authenticated'}, 401
 
 
+
 class LoginResource(Resource):
     def post(self):
         # Handle user login
@@ -57,16 +58,20 @@ class LoginResource(Resource):
         username = data.get('username')
         password = data.get('password')
 
+        # Clear user.id session before performing any operations
+        session.clear()
+
         # Validate and handle login logic
         user = User.query.filter_by(username=username).first()
+
         if user and user.check_password(password):
             # Login successful
-            session.clear()
             session['user_id'] = user.id
             return user.to_dict(), 200
         else:
             # Login failed
             return {'message': 'Invalid username or password'}, 401
+
 
 
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useDrag } from 'react-dnd';
 
-const PageItem = ({ block, onDrop }) => {
+const PageBlock = ({ block, onDrop }) => {
   const [{ isDragging }, drag] = useDrag({
     item: { type: 'block', id: block.id },
     collect: monitor => ({
@@ -25,4 +25,4 @@ const PageItem = ({ block, onDrop }) => {
   );
 };
 
-export default PageItem;
+export default PageBlock;

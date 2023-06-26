@@ -3,7 +3,7 @@ import React, { createContext, useEffect, useState } from 'react';
 export const AppContext = createContext(null);
 
 export const AppProvider = ({ children }) => {
-  const [user, setUser] = useState();
+  const [user, setUser] = useState(null);
   const [location, setLocation] = useState(null);
 
   const checkAuthentication = async () => {
@@ -39,30 +39,29 @@ export const AppProvider = ({ children }) => {
     };
   }, []);
 
-  const login = async (userData) => {
-    try {
-      console.log('Login data:', userData);
-      const response = await fetch('/users/login', {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username: userData }), // Ensure `userData` is an object with a `username` property
-      });
-      console.log('Response:', response);
+  const login = (userData) => {
+  fetch('/users/login', {
+    method: 'POST',
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(userData), // Pass the entire userData object
+  })
+    .then((response) => {
       if (response.ok) {
-        const user = await response.json();
-        setUser(user);
+        return response.json();
       } else {
-        console.error('Login failed:', response);
+        throw new Error('Login failed');
       }
-    } catch (error) {
+    })
+    .then((user) => {
+      setUser(user);
+    })
+    .catch((error) => {
       console.error('Error during login:', error);
-    }
-  };
-  
-  
+    });
+};
 
   const signup = async (userData) => {
     try {
@@ -88,14 +87,11 @@ export const AppProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      const response = await fetch('/users', {
-        method: 'DELETE',
+      const response = await fetch('/users/logout', {
+        method: 'POST',
         credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
       });
-  
+
       if (response.ok) {
         setUser(null);
       } else {
@@ -105,16 +101,12 @@ export const AppProvider = ({ children }) => {
       console.error('Error during logout:', error);
     }
   };
-  
-  
 
   const getBackgroundClass = () => {
     if (location) {
       switch (location.pathname) {
         case '/landing':
           return 'bg-red-500';
-        case '/dash':
-          return 'bg-green-500';
         case '/login':
           return 'bg-blue-500';
         case '/signup':
@@ -123,7 +115,7 @@ export const AppProvider = ({ children }) => {
           return 'bg-indigo-500';
       }
     }
-    return 'bg-indigo-500';
+    return 'bg-white';
   };
 
   const backgroundClass = getBackgroundClass();

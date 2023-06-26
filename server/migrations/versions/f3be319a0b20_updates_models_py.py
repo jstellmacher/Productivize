@@ -1,8 +1,8 @@
-"""ughhhh
+"""updates models.py
 
-Revision ID: aa775746c7fe
+Revision ID: f3be319a0b20
 Revises: 
-Create Date: 2023-06-24 01:05:51.227725
+Create Date: 2023-06-26 14:41:44.917132
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'aa775746c7fe'
+revision = 'f3be319a0b20'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -73,6 +73,14 @@ def upgrade():
     sa.ForeignKeyConstraint(['id'], ['blocks.id'], name=op.f('fk_image_blocks_id_blocks')),
     sa.PrimaryKeyConstraint('id')
     )
+    op.create_table('inputs',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('label', sa.String(length=100), nullable=False),
+    sa.Column('value', sa.String(length=100), nullable=False),
+    sa.Column('block_id', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['block_id'], ['blocks.id'], name=op.f('fk_inputs_block_id_blocks')),
+    sa.PrimaryKeyConstraint('id')
+    )
     op.create_table('numbered_list_blocks',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['id'], ['blocks.id'], name=op.f('fk_numbered_list_blocks_id_blocks')),
@@ -108,6 +116,7 @@ def downgrade():
     op.drop_table('text_blocks')
     op.drop_table('quote_blocks')
     op.drop_table('numbered_list_blocks')
+    op.drop_table('inputs')
     op.drop_table('image_blocks')
     op.drop_table('heading_blocks')
     op.drop_table('divider_blocks')

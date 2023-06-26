@@ -7,18 +7,19 @@ from random import randint, choice as rc
 from faker import Faker
 
 # Local imports
-from app import app, db
+from config import app, db
 from models import User, Page, Block, TextBlock, HeadingBlock, ImageBlock, VideoBlock, BulletedListBlock, \
-    NumberedListBlock, ToggleBlock, QuoteBlock, DividerBlock, CalloutBlock, CodeBlock
+    NumberedListBlock, ToggleBlock, QuoteBlock, DividerBlock, CalloutBlock, CodeBlock, Input
 
 if __name__ == '__main__':
     fake = Faker()
-    with app.app_context():
-        print("Starting seed...")
 
+    with app.app_context():
         # Drop existing tables and recreate them
         db.drop_all()
         db.create_all()
+
+        print("Starting seed...")
 
         # Seed code goes here!
         # Example: Creating sample users
@@ -82,6 +83,17 @@ if __name__ == '__main__':
                 else:
                     # Handle unsupported block types or add additional block types as needed
                     continue
+
+                # Add random inputs to the block
+                for _ in range(randint(1, 3)):
+                    input_data = {
+                        "label": fake.word(),
+                        "placeholder": fake.sentence(),
+                        "value": fake.word(),
+                        "block_id": block.id
+                    }
+                    input_field = Input(**input_data)
+                    block.inputs.append(input_field)
 
                 db.session.add(block)
 
