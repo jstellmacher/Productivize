@@ -54,21 +54,21 @@ const App = () => {
         {user && <Nav onLogout={handleLogout} />}
 
         <div className="container mx-auto px-4">
-          <Switch>
-            <Route exact path="/">
-              {user ? <Redirect to="/dash" /> : <Landing />}
-            </Route>
-            <Route path="/dash" component={Pages} />
-            <Route path="/dash">
-              {user ? <Dash /> : <Redirect to="/login" />}
-            </Route>
-            <Route path="/login">
-              {user ? <Redirect to="/dash" /> : <Login />}
-            </Route>
-            <Route path="/signup">
-              {user ? <Redirect to="/dash" /> : <Signup />}
-            </Route>
-          </Switch>
+        <Switch>
+          <Route exact path="/">
+            {user ? <Redirect to="/dash" /> : <Landing />}
+          </Route>
+          <Route path="/dash">
+            {user ? <Dash /> : <Redirect to="/login" />}
+          </Route>
+          <Route path="/login">
+            {user ? <Redirect to="/dash" /> : <Login />}
+          </Route>
+          <Route path="/signup">
+            {user ? <Redirect to="/dash" /> : <Signup />}
+          </Route>
+        </Switch>
+
         </div>
       </div>
     </Router>
