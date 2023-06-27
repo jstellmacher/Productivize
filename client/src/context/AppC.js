@@ -39,33 +39,31 @@ export const AppProvider = ({ children }) => {
     };
   }, []);
 
-  const login = (userData) => {
-  fetch('/users/login', {
-    method: 'POST',
-    credentials: 'include',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(userData), // Pass the entire userData object
-  })
-    .then((response) => {
+  const login = async (userData) => {
+    try {
+      const response = await fetch('/users', {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(userData),
+      });
+
       if (response.ok) {
-        return response.json();
+        const user = await response.json();
+        setUser(user);
       } else {
         throw new Error('Login failed');
       }
-    })
-    .then((user) => {
-      setUser(user);
-    })
-    .catch((error) => {
+    } catch (error) {
       console.error('Error during login:', error);
-    });
-};
+    }
+  };
 
   const signup = async (userData) => {
     try {
-      const response = await fetch('/users/signup', {
+      const response = await fetch('/signup', {
         method: 'POST',
         credentials: 'include',
         headers: {
@@ -87,8 +85,8 @@ export const AppProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      const response = await fetch('/users/logout', {
-        method: 'POST',
+      const response = await fetch('/users', {
+        method: 'DELETE',
         credentials: 'include',
       });
 

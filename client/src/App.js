@@ -7,7 +7,7 @@ import {
 } from "react-router-dom";
 import Nav from "./components/Nav";
 import Landing from "./components/Landing";
-import Pages from "./components/Pages";
+import Pages from "./components/Page";
 import Login from "./components/Login";
 import Signup from "./components/Signup";
 import Dash from "./components/Dash";

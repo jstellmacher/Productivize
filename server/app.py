@@ -1,37 +1,31 @@
-from flask import request, session, jsonify, abort
+from flask import request, session, jsonify
 from flask_restful import Resource
 from config import app, api, db
 from models import User, Page, Block, TextBlock, HeadingBlock, ImageBlock
+from werkzeug.security import check_password_hash, generate_password_hash
 
 
 class UserResource(Resource):
     def post(self):
-        # User authentication
+        # User login
         data = request.get_json()
         username = data.get('username')
         password = data.get('password')
 
-        print('Received data:', data)
-        # print('Username:', username)
-        # print('Password:', password)
-
         user = User.query.filter_by(username=username).first()
 
-        print('User:', user)
-
         if user and user.check_password(password):
-            # Authentication successful
+            # Login successful
             session['user_id'] = user.id
             return {'message': 'Authentication successful'}, 200
         else:
-            # Authentication failed
+            # Login failed
             return {'message': 'Invalid username or password'}, 401
-
-
 
     def delete(self):
         # User logout
         session.pop('user_id', None)
+        session.clear()
         return {'message': 'Logout successful'}, 200
 
     def get(self):
@@ -45,42 +39,6 @@ class UserResource(Resource):
         return {'message': 'User not authenticated'}, 401
 
 
-
-class LoginResource(Resource):
-    def post(self):
-        # Handle user login
-        data = request.get_json(force=True)  # Parse request data as JSON
-        print(data)
-
-        if not data:
-            return {'message': 'Invalid JSON data'}, 400
-
-        username = data.get('username')
-        password = data.get('password')
-
-        # Clear user.id session before performing any operations
-        session.clear()
-
-        # Validate and handle login logic
-        user = User.query.filter_by(username=username).first()
-
-        if user and user.check_password(password):
-            # Login successful
-            session['user_id'] = user.id
-            return user.to_dict(), 200
-        else:
-            # Login failed
-            return {'message': 'Invalid username or password'}, 401
-
-
-
-
-class LogoutResource(Resource):
-    def post(self):
-        session.clear()
-        return {"message": "Logout successful! Have a great day!"}, 200
-
-
 class SignUpResource(Resource):
     def post(self):
         # Sign up a new user
@@ -89,11 +47,9 @@ class SignUpResource(Resource):
         password = data.get('password')
         email = data.get('email')
 
-        # Validate and handle user sign-up logic
-
         # Create a new user object
         new_user = User(username=username, email=email)
-        new_user.password_hash = password
+        new_user.password_hash = generate_password_hash(password)
 
         # Save the user to the database
         db.session.add(new_user)
@@ -225,10 +181,8 @@ class BlockResource(Resource):
         return {'message': 'Block deleted successfully'}, 200
 
 
-api.add_resource(LoginResource, "/users/login")  # Add "/users/login" endpoint
-api.add_resource(LogoutResource, "/users/logout")  # Add "/users/logout" endpoint
-api.add_resource(SignUpResource, "/users/signup")
-api.add_resource(UserResource, "/users")  # Update the route to "/users"
+api.add_resource(UserResource, "/users")
+api.add_resource(SignUpResource, "/signup")
 api.add_resource(PageResource, "/pages", "/pages/<int:page_id>")
 api.add_resource(BlockResource, "/pages/<int:page_id>/blocks")
 

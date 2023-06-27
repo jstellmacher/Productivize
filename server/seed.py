@@ -10,6 +10,7 @@ from faker import Faker
 from config import app, db
 from models import User, Page, Block, TextBlock, HeadingBlock, ImageBlock, VideoBlock, BulletedListBlock, \
     NumberedListBlock, ToggleBlock, QuoteBlock, DividerBlock, CalloutBlock, CodeBlock, Input
+from werkzeug.security import generate_password_hash
 
 if __name__ == '__main__':
     fake = Faker()
@@ -30,7 +31,7 @@ if __name__ == '__main__':
                 "email": fake.email()
             }
             user = User(**user_data)
-            user.password_hash = password  # Set the password hash using the updated method
+            user.password_hash = generate_password_hash(password)  # Set the password hash using the updated method
             db.session.add(user)
 
         # Example: Creating sample pages associated with users

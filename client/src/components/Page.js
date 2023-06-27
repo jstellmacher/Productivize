@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import PageBlock from './PageBlock';
 import { useDrop } from 'react-dnd';
-import { ItemTypes } from './ItemTypes'; // Define the types of items for drag and drop
+import { BlockTypes } from './BlockTypes';
+import { FiTrash2, FiSquare, FiCircle, FiTriangle } from 'react-icons/fi';
+import PageBlock from './PageBlock';
 
 const Page = ({ page }) => {
   const [blocks, setBlocks] = useState([]);
@@ -9,18 +10,18 @@ const Page = ({ page }) => {
 
   useEffect(() => {
     fetch(`/pages/${page.id}/blocks`)
-      .then(response => {
+      .then((response) => {
         if (!response.ok) {
           throw new Error('Error fetching blocks');
         }
         return response.json();
       })
-      .then(data => {
+      .then((data) => {
         console.log('API response:', data);
-        setBlocks(data.blocks); // Access the 'blocks' property of the response
+        setBlocks(data.blocks);
         setError(null);
       })
-      .catch(error => {
+      .catch((error) => {
         console.error('Error fetching blocks:', error);
         setError(error.message);
       });
@@ -31,9 +32,14 @@ const Page = ({ page }) => {
   };
 
   const [, drop] = useDrop({
-    accept: ItemTypes.BLOCK,
+    accept: Object.values(BlockTypes), // Pass an array of accepted types
     drop: (item) => handleDrop(item.id),
   });
+  
+  // const [, drop] = useDrop({
+  //   accept: BlockTypes.BLOCK,
+  //   drop: (item) => handleDrop(item.id),
+  // });
 
   if (error) {
     return <div>Error: {error}</div>;
@@ -46,7 +52,7 @@ const Page = ({ page }) => {
         {blocks.length === 0 ? (
           <div className="bg-gray-200 rounded p-4">No blocks available</div>
         ) : (
-          blocks.map(block => (
+          blocks.map((block) => (
             <PageBlock
               key={block.id}
               block={block}
@@ -61,6 +67,23 @@ const Page = ({ page }) => {
           {/* Grid lines or any other design elements for the lock-to-grid area */}
         </div>
       </div>
+      <div className="flex items-center mt-4">
+        <div
+          className="flex items-center justify-center h-8 w-8 rounded-full bg-red-500 text-white cursor-pointer"
+          title="Trash Bin"
+        >
+          <FiTrash2 size={16} />
+        </div>
+        <div className="flex items-center justify-center h-8 w-8 rounded-full bg-gray-200 text-gray-600 ml-2">
+          <FiSquare size={16} />
+        </div>
+        <div className="flex items-center justify-center h-8 w-8 rounded-full bg-gray-200 text-gray-600 ml-2">
+          <FiCircle size={16} />
+        </div>
+        <div className="flex items-center justify-center h-8 w-8 rounded-full bg-gray-200 text-gray-600 ml-2">
+          <FiTriangle size={16} />
+        </div>
+      </div>
     </div>
   );
 };
@@ -70,22 +93,31 @@ const Pages = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    let isMounted = true; // Add a flag to track the mounted state
+
     fetch('/pages')
-      .then(response => {
+      .then((response) => {
         if (!response.ok) {
           throw new Error('Error fetching pages');
         }
         return response.json();
       })
-      .then(data => {
-        console.log('API response:', data);
-        setPages(data.pages);
-        setError(null);
+      .then((data) => {
+        if (isMounted) {
+          // Check if the component is still mounted before updating the state
+          console.log('API response:', data);
+          setPages(data.pages);
+          setError(null);
+        }
       })
-      .catch(error => {
+      .catch((error) => {
         console.error('Error fetching pages:', error);
         setError(error.message);
       });
+
+    return () => {
+      isMounted = false; // Cleanup function to update the mounted state when the component unmounts
+    };
   }, []);
 
   if (error) {
@@ -102,7 +134,7 @@ const Pages = () => {
             <div className="bg-gray-200 rounded p-4">No blocks available</div>
           </div>
         ) : (
-          pages.map(page => <Page key={page.id} page={page} />)
+          pages.map((page) => <Page key={page.id} page={page} />)
         )}
       </div>
     </div>

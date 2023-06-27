@@ -1,8 +1,8 @@
-"""updates models.py
+"""makin money moves
 
-Revision ID: f3be319a0b20
+Revision ID: fdb490db4951
 Revises: 
-Create Date: 2023-06-26 14:41:44.917132
+Create Date: 2023-06-27 01:49:08.774673
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'f3be319a0b20'
+revision = 'fdb490db4951'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -21,7 +21,7 @@ def upgrade():
     op.create_table('users',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('username', sa.String(length=100), nullable=False),
-    sa.Column('_password_hash', sa.String(length=100), nullable=False),
+    sa.Column('_password_hash', sa.String(length=128), nullable=False),
     sa.Column('email', sa.String(length=100), nullable=False),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('email'),
@@ -77,6 +77,7 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('label', sa.String(length=100), nullable=False),
     sa.Column('value', sa.String(length=100), nullable=False),
+    sa.Column('placeholder', sa.String(length=100), nullable=False),
     sa.Column('block_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['block_id'], ['blocks.id'], name=op.f('fk_inputs_block_id_blocks')),
     sa.PrimaryKeyConstraint('id')
