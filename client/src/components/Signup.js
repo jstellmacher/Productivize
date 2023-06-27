@@ -31,7 +31,7 @@ const Signup = () => {
 
       if (response.ok) {
         // Signup successful
-        history.push("/"); // Redirect to the home page or desired route
+        // history.push("/"); // Redirect to the home page or desired route
       } else {
         // Signup failed
         const data = await response.json();

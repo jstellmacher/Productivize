@@ -1,16 +1,19 @@
-import React, { createContext, useEffect, useState } from 'react';
+import React, { createContext, useEffect, useState } from "react";
 
 export const AppContext = createContext(null);
 
 export const AppProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState();
   const [location, setLocation] = useState(null);
+
+  const addPage = (page) => {
+    setUser((user) => ({ ...user, pages: [...user.pages, page] }));
+  };
 
   const checkAuthentication = async () => {
     try {
-      const response = await fetch('/users', {
-        method: 'GET',
-        credentials: 'include',
+      const response = await fetch("/users", {
+        method: "GET",
       });
 
       if (response.ok) {
@@ -20,7 +23,7 @@ export const AppProvider = ({ children }) => {
         setUser(null);
       }
     } catch (error) {
-      console.error('Error checking authentication:', error);
+      console.error("Error checking authentication:", error);
       setUser(null);
     }
   };
@@ -32,97 +35,117 @@ export const AppProvider = ({ children }) => {
       setLocation(window.location);
     };
 
-    window.addEventListener('popstate', handleLocationChange);
+    window.addEventListener("popstate", handleLocationChange);
 
     return () => {
-      window.removeEventListener('popstate', handleLocationChange);
+      window.removeEventListener("popstate", handleLocationChange);
     };
   }, []);
 
   const login = async (userData) => {
     try {
-      const response = await fetch('/users', {
-        method: 'POST',
-        credentials: 'include',
+      console.log("Login initiated:", userData); // Log the userData object
+
+      const response = await fetch("/users", {
+        method: "POST",
+        credentials: "include",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(userData),
       });
 
+      console.log("Login response:", response); // Log the response object
+
       if (response.ok) {
         const user = await response.json();
+        console.log("Login successful. User:", user); // Log the user object
         setUser(user);
       } else {
-        throw new Error('Login failed');
+        throw new Error("Login failed");
       }
     } catch (error) {
-      console.error('Error during login:', error);
+      console.error("Error during login:", error);
     }
   };
 
   const signup = async (userData) => {
     try {
-      const response = await fetch('/signup', {
-        method: 'POST',
-        credentials: 'include',
+      const response = await fetch("/signup", {
+        method: "POST",
+        // credentials: 'include',
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(userData),
       });
 
       if (response.ok) {
-        const user = await response.json();
-        setUser(user);
+        response.json().then((data) => setUser(data));
       } else {
-        console.error('Signup failed:', response);
+        console.error("Signup failed:", response);
       }
+      return response;
     } catch (error) {
-      console.error('Error during signup:', error);
+      console.error("Error during signup:", error);
     }
   };
 
   const logout = async () => {
     try {
-      const response = await fetch('/users', {
-        method: 'DELETE',
-        credentials: 'include',
+      const response = await fetch("/users", {
+        method: "DELETE",
+        // credentials: 'include',
       });
 
       if (response.ok) {
         setUser(null);
       } else {
-        console.error('Logout failed:', response);
+        console.error("Logout failed:", response);
       }
     } catch (error) {
-      console.error('Error during logout:', error);
+      console.error("Error during logout:", error);
     }
+  };
+
+  const removePage = (id) => {
+    setUser((user) => ({
+      ...user,
+      pages: user.pages.filter((page) => page.id !== id),
+    }));
   };
 
   const getBackgroundClass = () => {
     if (location) {
       switch (location.pathname) {
-        case '/landing':
-          return 'bg-red-500';
-        case '/login':
-          return 'bg-blue-500';
-        case '/signup':
-          return 'bg-yellow-500';
+        case "/landing":
+          return "bg-red-500";
+        case "/login":
+          return "bg-blue-500";
+        case "/signup":
+          return "bg-yellow-500";
         default:
-          return 'bg-indigo-500';
+          return "bg-indigo-500";
       }
     }
-    return 'bg-white';
+    return "bg-white";
   };
 
   const backgroundClass = getBackgroundClass();
 
   return (
-    <AppContext.Provider value={{ user, login, signup, logout, checkAuthentication }}>
-      <div className={`bg-indigo-500 ${backgroundClass}`}>
-        {children}
-      </div>
+    <AppContext.Provider
+      value={{
+        user,
+        login,
+        signup,
+        logout,
+        checkAuthentication,
+        addPage,
+        removePage,
+      }}
+    >
+      <div className={`bg-indigo-500 ${backgroundClass}`}>{children}</div>
     </AppContext.Provider>
   );
 };

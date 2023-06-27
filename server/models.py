@@ -1,6 +1,6 @@
 from sqlalchemy_serializer import SerializerMixin
 from sqlalchemy.ext.hybrid import hybrid_property
-from config import db, bcrypt
+from config import db
 from werkzeug.security import generate_password_hash, check_password_hash
 
 
@@ -9,18 +9,18 @@ class User(db.Model, SerializerMixin):
 
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), unique=True, nullable=False)
-    _password_hash = db.Column(db.String(128), nullable=False)
+    _password_hash = db.Column('password_hash', db.String(128))
     email = db.Column(db.String(100), unique=True, nullable=False)
     pages = db.relationship('Page', backref='user', lazy=True)
 
-    serialize_rules = ("-pages._password_hash", "-pages.blocks._password_hash")
+    serialize_rules = ("-_password_hash",)
 
     @hybrid_property
-    def password_hash(self):
+    def password(self):
         raise Exception('Password hashes may not be viewed.')
 
-    @password_hash.setter
-    def password_hash(self, password):
+    @password.setter
+    def password(self, password):
         self._password_hash = generate_password_hash(password)
 
     def check_password(self, password):
@@ -76,13 +76,13 @@ class Block(db.Model, SerializerMixin):
         }
 
 
-class Input(db.Model, SerializerMixin):
+class Input(db.Model):
     __tablename__ = 'inputs'
 
     id = db.Column(db.Integer, primary_key=True)
     label = db.Column(db.String(100), nullable=False)
-    value = db.Column(db.String(100), nullable=False)
-    placeholder = db.Column(db.String(100), nullable=False)
+    input_type = db.Column(db.String(50), nullable=False)
+    placeholder = db.Column(db.String(100))
     block_id = db.Column(db.Integer, db.ForeignKey('blocks.id'), nullable=False)
 
     def serialize(self):

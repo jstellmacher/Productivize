@@ -2,7 +2,7 @@ from flask import request, session, jsonify
 from flask_restful import Resource
 from config import app, api, db
 from models import User, Page, Block, TextBlock, HeadingBlock, ImageBlock
-from werkzeug.security import check_password_hash, generate_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
 
 
 class UserResource(Resource):
@@ -13,11 +13,12 @@ class UserResource(Resource):
         password = data.get('password')
 
         user = User.query.filter_by(username=username).first()
-
+        # import ipdb
+        # ipdb.set_trace()
         if user and user.check_password(password):
             # Login successful
             session['user_id'] = user.id
-            return {'message': 'Authentication successful'}, 200
+            return user.to_dict(), 200
         else:
             # Login failed
             return {'message': 'Invalid username or password'}, 401
@@ -34,7 +35,7 @@ class UserResource(Resource):
         if user_id:
             user = User.query.get(user_id)
             if user:
-                return {'message': 'User session active'}, 200
+                return user.to_dict(), 200
 
         return {'message': 'User not authenticated'}, 401
 
@@ -49,7 +50,7 @@ class SignUpResource(Resource):
 
         # Create a new user object
         new_user = User(username=username, email=email)
-        new_user.password_hash = generate_password_hash(password)
+        new_user.password = password  # Set the password
 
         # Save the user to the database
         db.session.add(new_user)
@@ -57,6 +58,7 @@ class SignUpResource(Resource):
         session['user_id'] = new_user.id
 
         return new_user.to_dict(), 201
+
 
 
 class PageResource(Resource):
@@ -148,37 +150,6 @@ class BlockResource(Resource):
             return {'message': 'Block created successfully', 'block_id': block.id}, 201
         else:
             return {'message': 'Invalid block type'}, 400
-
-
-    def put(self, page_id, block_id):
-        # Update an existing block
-        data = request.get_json()
-        content = data.get('content')
-
-        # Validate and handle block update logic
-
-        block = Block.query.filter_by(id=block_id, page_id=page_id).first()
-        if block is None:
-            return {'message': 'Block not found'}, 404
-
-        # Update the block
-        block.content = content
-        db.session.commit()
-
-        return {'message': 'Block updated successfully'}, 200
-
-
-    def delete(self, page_id, block_id):
-        # Delete an existing block
-        block = Block.query.filter_by(id=block_id, page_id=page_id).first()
-        if block is None:
-            return {'message': 'Block not found'}, 404
-
-        # Delete the block
-        db.session.delete(block)
-        db.session.commit()
-
-        return {'message': 'Block deleted successfully'}, 200
 
 
 api.add_resource(UserResource, "/users")
