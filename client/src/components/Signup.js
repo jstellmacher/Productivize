@@ -34,8 +34,8 @@ const Signup = () => {
         // history.push("/"); // Redirect to the home page or desired route
       } else {
         // Signup failed
-        const data = await response.json();
-        setErrorMessage(data.message);
+        const errorData = await response.json();
+        setErrorMessage(errorData.message || "Signup failed. Please try again.");
       }
     } catch (error) {
       console.error("Error signing up:", error);

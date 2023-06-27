@@ -12,10 +12,18 @@ export const AppProvider = ({ children }) => {
 
   const checkAuthentication = async () => {
     try {
+      const isLoginPage = window.location.pathname === "/login";
+      const isSignupPage = window.location.pathname === "/signup";
+      
+      if (isLoginPage || isSignupPage) {
+        setUser(null);
+        return;
+      }
+  
       const response = await fetch("/users", {
         method: "GET",
       });
-
+  
       if (response.ok) {
         const user = await response.json();
         setUser(user);
@@ -27,6 +35,7 @@ export const AppProvider = ({ children }) => {
       setUser(null);
     }
   };
+  
 
   useEffect(() => {
     checkAuthentication();
