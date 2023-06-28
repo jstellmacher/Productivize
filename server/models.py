@@ -81,6 +81,7 @@ class Input(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     label = db.Column(db.String(100), nullable=False)
+    value = db.Column(db.String(100))  # Add this column
     input_type = db.Column(db.String(50), nullable=False)
     placeholder = db.Column(db.String(100))
     block_id = db.Column(db.Integer, db.ForeignKey('blocks.id'), nullable=False)
@@ -94,6 +95,7 @@ class Input(db.Model):
             'placeholder': self.placeholder,
             'block_id': self.block_id
         }
+
 
 
 class TextBlock(Block):

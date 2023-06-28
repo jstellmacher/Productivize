@@ -1,8 +1,8 @@
-"""sleep
+"""fixes input value
 
-Revision ID: 5be6f62b4518
+Revision ID: dbd130c55325
 Revises: 
-Create Date: 2023-06-27 15:04:17.293446
+Create Date: 2023-06-28 14:09:16.787795
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '5be6f62b4518'
+revision = 'dbd130c55325'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -76,6 +76,7 @@ def upgrade():
     op.create_table('inputs',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('label', sa.String(length=100), nullable=False),
+    sa.Column('value', sa.String(length=100), nullable=True),
     sa.Column('input_type', sa.String(length=50), nullable=False),
     sa.Column('placeholder', sa.String(length=100), nullable=True),
     sa.Column('block_id', sa.Integer(), nullable=False),
