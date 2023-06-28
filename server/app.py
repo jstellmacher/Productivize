@@ -76,21 +76,25 @@ class PageResource(Resource):
             # Serialize and return the page
             return page.serialize()
 
-    def post(self):
+    def post(self, page_id):
         # Create a new page
         data = request.get_json()
-        title = data.get('title')
 
-        # Validate and handle page creation logic
+        # Obtain the user_id from the session
+        user_id = session.get('user_id')
 
-        # Create a new page object
-        new_page = Page(title=title, user_id=session['user_id'])
+        # Create a new page object with the title as the page ID
+        new_page = Page(id=page_id, title=str(page_id), user_id=user_id)
 
         # Save the page to the database
         db.session.add(new_page)
         db.session.commit()
 
         return {'message': 'Page created successfully', 'page_id': new_page.id}, 201
+
+
+
+
 
     def put(self, page_id):
         # Update an existing page

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext } from "react";
 import {
   BrowserRouter as Router,
   Switch,
@@ -7,15 +7,16 @@ import {
 } from "react-router-dom";
 import Nav from "./components/Nav";
 import Landing from "./components/Landing";
-import Pages from "./components/Page";
 import Login from "./components/Login";
 import Signup from "./components/Signup";
 import Dash from "./components/Dash";
+import Forgot from "./components/Forgot";
 import { AppContext } from "./context/AppC";
 import "./index.css";
+// import Page from "./components/Page";
 
 const App = () => {
-  const { user, login, logout } = useContext(AppContext);
+  const { user, logout } = useContext(AppContext);
 
   const handleLogout = async () => {
     await logout();
@@ -43,6 +44,9 @@ const App = () => {
             </Route>
             <Route path="/signup">
               {user ? <Redirect to="/dash" /> : <Signup />}
+            </Route>
+            <Route path="/forgot">
+              <Forgot />
             </Route>
           </Switch>
         </div>
