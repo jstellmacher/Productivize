@@ -43,7 +43,7 @@ const Dash = () => {
   };
 
   const handleEditPage = (pageId) => {
-    history.push(`/page/edit/${pageId}`);
+    history.push(`/page/${pageId}`);
   };
 
   const handleTitleEdit = (event, pageId) => {
@@ -84,7 +84,7 @@ const Dash = () => {
       <div className="rounded-xl shadow-xl bg-gray-400 border-slate-900 h-[80vh] p-4 overflow-y-auto">
         <div className="flex items-center justify-end mb-4">
           <div className="flex items-center">
-            <TiFilter className="h-6 w-6 text-gray-600" /> {/* Use the filter icon */}
+            <TiFilter className="h-6 w-6 text-gray-600" />
             <label className="ml-2 text-gray-700">
               <input
                 type="checkbox"

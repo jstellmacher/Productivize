@@ -14,7 +14,8 @@ class User(db.Model, SerializerMixin):
     email = db.Column(db.String(100), unique=True, nullable=False)
     pages = db.relationship('Page', backref='user', lazy=True)
 
-    serialize_rules = ("-_password_hash", "-pages.user",)
+    serialize_rules = ("-_password_hash", "-pages.user","-pages.user",)
+
 
     @hybrid_property
     def password(self):
@@ -29,6 +30,13 @@ class User(db.Model, SerializerMixin):
             return False
         return check_password_hash(self._password_hash, password)
 
+    def serialize(self):
+        return {
+            'id': self.id,
+            'username': self.username,
+            'email': self.email
+        }
+
 
 class Page(db.Model, SerializerMixin):
     __tablename__ = 'pages'
@@ -37,6 +45,17 @@ class Page(db.Model, SerializerMixin):
     title = db.Column(db.String(100))
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     created_at = db.Column(DateTime, default=datetime.utcnow)
+
+    blocks = db.relationship('Block', backref='page')
+    def serialize(self):
+        return {
+            'id': self.id,
+            'title': self.title,
+            'created_at': self.created_at.isoformat(),
+            'user': self.user.serialize(),
+            'blocks': [block.to_dict() for block in self.blocks]  # Serialize the associated user object
+        }
+
 
 class Block(db.Model, SerializerMixin):
     __tablename__ = 'blocks'
@@ -54,7 +73,6 @@ class Block(db.Model, SerializerMixin):
     }
 
     def serialize(self):
-        # Serialize the block object to a dictionary
         return {
             'id': self.id,
             'type': self.type,
@@ -76,11 +94,11 @@ class Input(db.Model):
     block_id = db.Column(db.Integer, db.ForeignKey('blocks.id'), nullable=False)
 
     def serialize(self):
-        # Serialize the input object to a dictionary
         return {
             'id': self.id,
             'label': self.label,
             'value': self.value,
+            'input_type': self.input_type,
             'placeholder': self.placeholder,
             'block_id': self.block_id
         }
@@ -95,9 +113,7 @@ class TextBlock(Block):
     }
 
     def serialize(self):
-        # Serialize the text block object to a dictionary
         serialized_data = super().serialize()
-        # Add text block specific attributes to the serialized data
         serialized_data['text_specific_attribute'] = 'text_specific_value'
         return serialized_data
 
@@ -111,9 +127,7 @@ class HeadingBlock(Block):
     }
 
     def serialize(self):
-        # Serialize the heading block object to a dictionary
         serialized_data = super().serialize()
-        # Add heading block specific attributes to the serialized data
         serialized_data['heading_specific_attribute'] = 'heading_specific_value'
         return serialized_data
 
@@ -127,9 +141,7 @@ class ImageBlock(Block):
     }
 
     def serialize(self):
-        # Serialize the image block object to a dictionary
         serialized_data = super().serialize()
-        # Add image block specific attributes to the serialized data
         serialized_data['image_specific_attribute'] = 'image_specific_value'
         return serialized_data
 
@@ -143,9 +155,7 @@ class VideoBlock(Block):
     }
 
     def serialize(self):
-        # Serialize the video block object to a dictionary
         serialized_data = super().serialize()
-        # Add video block specific attributes to the serialized data
         serialized_data['video_specific_attribute'] = 'video_specific_value'
         return serialized_data
 
@@ -159,9 +169,7 @@ class BulletedListBlock(Block):
     }
 
     def serialize(self):
-        # Serialize the bulleted list block object to a dictionary
         serialized_data = super().serialize()
-        # Add bulleted list block specific attributes to the serialized data
         serialized_data['bulleted_list_specific_attribute'] = 'bulleted_list_specific_value'
         return serialized_data
 
@@ -175,9 +183,7 @@ class NumberedListBlock(Block):
     }
 
     def serialize(self):
-        # Serialize the numbered list block object to a dictionary
         serialized_data = super().serialize()
-        # Add numbered list block specific attributes to the serialized data
         serialized_data['numbered_list_specific_attribute'] = 'numbered_list_specific_value'
         return serialized_data
 
@@ -191,9 +197,7 @@ class ToggleBlock(Block):
     }
 
     def serialize(self):
-        # Serialize the toggle block object to a dictionary
         serialized_data = super().serialize()
-        # Add toggle block specific attributes to the serialized data
         serialized_data['toggle_specific_attribute'] = 'toggle_specific_value'
         return serialized_data
 
@@ -207,8 +211,6 @@ class QuoteBlock(Block):
     }
 
     def serialize(self):
-        # Serialize the quote block object to a dictionary
         serialized_data = super().serialize()
-        # Add quote block specific attributes to the serialized data
         serialized_data['quote_specific_attribute'] = 'quote_specific_value'
         return serialized_data

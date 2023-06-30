@@ -1,8 +1,8 @@
-"""why is it like this
+"""brain pops
 
-Revision ID: 34a4af83e414
+Revision ID: 78f9f678f5d5
 Revises: 
-Create Date: 2023-06-29 17:59:33.416709
+Create Date: 2023-06-30 00:06:15.573578
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '34a4af83e414'
+revision = '78f9f678f5d5'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -31,6 +31,7 @@ def upgrade():
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('title', sa.String(length=100), nullable=True),
     sa.Column('user_id', sa.Integer(), nullable=False),
+    sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], name=op.f('fk_pages_user_id_users')),
     sa.PrimaryKeyConstraint('id')
     )

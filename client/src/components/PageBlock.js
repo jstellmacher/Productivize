@@ -1,6 +1,7 @@
 import React from 'react';
 import { useDrag } from 'react-dnd';
 import { BlockTypes } from './BlockTypes';
+import { Input } from './Input';
 
 const PageBlock = ({ block, blockType, onDrop }) => {
   const [{ isDragging }, drag] = useDrag({
@@ -78,23 +79,6 @@ const PageBlock = ({ block, blockType, onDrop }) => {
   };
   
 
-  const renderInputs = () => {
-    if (block.inputs) {
-      return block.inputs.map(input => (
-        <div key={input.id}>
-          <label>{input.label}</label>
-          <input
-            type="text"
-            value={input.value}
-            placeholder={input.placeholder}
-            readOnly
-          />
-        </div>
-      ));
-    }
-    return null;
-  };
-  
 
   return (
     <div
@@ -104,7 +88,7 @@ const PageBlock = ({ block, blockType, onDrop }) => {
     >
       <p>{block.title}</p>
       {renderBlockContent()}
-      {renderInputs()}
+      {block.inputs && block.inputs.map((input) => <Input key={input.id} input={input} />)}
     </div>
   );
 };

@@ -13,7 +13,8 @@ import Dash from "./components/Dash";
 import Forgot from "./components/Forgot";
 import { AppContext } from "./context/AppC";
 import About from "./components/About";
-import Profile from "./components/Profile"; 
+import Profile from "./components/Profile";
+import Page from "./components/Page"; // Import the Page component
 import "./index.css";
 
 const App = () => {
@@ -52,8 +53,13 @@ const App = () => {
             <Route path="/about">
               <About />
             </Route>
-            <Route path="/profile"> // Add a new route for the profile page
+            <Route path="/profile">
               {user ? <Profile /> : <Redirect to="/login" />}
+            </Route>
+            <Route path="/page/:id">
+              {" "}
+              {/* Add a dynamic parameter for page ID */}
+              <Page />
             </Route>
           </Switch>
         </div>

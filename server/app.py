@@ -67,14 +67,14 @@ class PageResource(Resource):
             pages = Page.query.all()
             # Serialize and return the pages
             serialized_pages = [page.to_dict() for page in pages]
-            return jsonify(serialized_pages), 200
+            return serialized_pages, 200
         else:
             # Get a specific page
             page = Page.query.get(page_id)
             if page is None:
                 return {'message': 'Page not found'}, 404
             # Serialize and return the page
-            return jsonify(page.to_dict())
+            return page.to_dict(), 200
 
     def post(self, page_id=None):
         if page_id is None:
@@ -95,7 +95,6 @@ class PageResource(Resource):
         db.session.commit()
 
         return {'message': 'Page created successfully', 'page_id': new_page.id}, 201
-
     def patch(self, page_id):
         # Update an existing page's title
         data = request.get_json()
