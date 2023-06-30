@@ -1,4 +1,4 @@
-import React, { createContext, useEffect, useState } from "react";
+import React, { createContext, useEffect, useState, useContext } from "react";
 
 export const AppContext = createContext(null);
 
@@ -8,22 +8,23 @@ export const AppProvider = ({ children }) => {
 
   const addPage = (page) => {
     setUser((user) => ({ ...user, pages: [...user.pages, page] }));
+    console.log(user)
   };
 
   const checkAuthentication = async () => {
     try {
       const isLoginPage = window.location.pathname === "/login";
       const isSignupPage = window.location.pathname === "/signup";
-      
+
       if (isLoginPage || isSignupPage) {
         setUser(null);
         return;
       }
-  
+
       const response = await fetch("/users", {
         method: "GET",
       });
-  
+
       if (response.ok) {
         const user = await response.json();
         setUser(user);
@@ -35,7 +36,6 @@ export const AppProvider = ({ children }) => {
       setUser(null);
     }
   };
-  
 
   useEffect(() => {
     checkAuthentication();
@@ -82,7 +82,6 @@ export const AppProvider = ({ children }) => {
     try {
       const response = await fetch("/signup", {
         method: "POST",
-        // credentials: 'include',
         headers: {
           "Content-Type": "application/json",
         },
@@ -104,7 +103,6 @@ export const AppProvider = ({ children }) => {
     try {
       const response = await fetch("/users", {
         method: "DELETE",
-        // credentials: 'include',
       });
 
       if (response.ok) {
@@ -142,6 +140,16 @@ export const AppProvider = ({ children }) => {
 
   const backgroundClass = getBackgroundClass();
 
+  useEffect(() => {
+    console.log("User:", user); // Log the user state
+    console.log("Location:", location); // Log the location state
+  }, [user, location]);
+
+  const handleAddPage = () => {
+    const newPage = { id: user.pages.length + 1, title: "New Page" };
+    addPage(newPage);
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -152,9 +160,13 @@ export const AppProvider = ({ children }) => {
         checkAuthentication,
         addPage,
         removePage,
+        handleAddPage,
       }}
     >
       <div className={`bg-indigo-500 ${backgroundClass}`}>{children}</div>
     </AppContext.Provider>
   );
 };
+
+// Custom hook to access the AppContext
+export const useAppContext = () => useContext(AppContext);

@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
-import { RiHome4Line, RiPagesLine, RiLogoutCircleLine, RiLoginCircleLine } from 'react-icons/ri';
+import { RiHome4Line, RiPagesLine, RiLogoutCircleLine, RiLoginCircleLine, RiInformationLine } from 'react-icons/ri';
 import { AppContext } from '../context/AppC';
 
 const Nav = () => {
@@ -17,13 +17,22 @@ const Nav = () => {
           <ul className="flex space-x-4">
             <li>
               <Link
+                to="/about"
+                className="text-white flex items-center space-x-2 hover:text-gray-300 px-3 py-2 rounded-md text-sm font-medium"
+              >
+                <RiInformationLine className="text-xl" />
+                <span>About</span>
+              </Link>
+            </li>
+            {/* <li>
+              <Link
                 to="/pages"
                 className="text-white flex items-center space-x-2 hover:text-gray-300 px-3 py-2 rounded-md text-sm font-medium"
               >
                 <RiPagesLine className="text-xl" />
                 <span>Pages</span>
               </Link>
-            </li>
+            </li> */}
             {user ? (
               <li>
                 <button

@@ -12,6 +12,7 @@ import Signup from "./components/Signup";
 import Dash from "./components/Dash";
 import Forgot from "./components/Forgot";
 import { AppContext } from "./context/AppC";
+import About from "./components/About";
 import "./index.css";
 // import Page from "./components/Page";
 
@@ -47,6 +48,9 @@ const App = () => {
             </Route>
             <Route path="/forgot">
               <Forgot />
+            </Route>
+            <Route path="/about">
+              <About />
             </Route>
           </Switch>
         </div>

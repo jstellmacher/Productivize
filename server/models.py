@@ -7,13 +7,13 @@ from werkzeug.security import generate_password_hash, check_password_hash
 class User(db.Model, SerializerMixin):
     __tablename__ = 'users'
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     username = db.Column(db.String(100), unique=True, nullable=False)
     _password_hash = db.Column('password_hash', db.String(128))
     email = db.Column(db.String(100), unique=True, nullable=False)
     pages = db.relationship('Page', backref='user', lazy=True)
 
-    serialize_rules = ("-_password_hash",)
+    serialize_rules = ("-_password_hash", "-pages.user",)
 
     @hybrid_property
     def password(self):
@@ -29,30 +29,18 @@ class User(db.Model, SerializerMixin):
         return check_password_hash(self._password_hash, password)
 
 
-
-
 class Page(db.Model, SerializerMixin):
     __tablename__ = 'pages'
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     title = db.Column(db.String(100), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    blocks = db.relationship('Block', backref='page', lazy=True)
-
-    def serialize(self):
-        # Serialize the page object to a dictionary
-        return {
-            'id': self.id,
-            'title': self.title,
-            'user_id': self.user_id,
-            'blocks': [block.serialize() for block in self.blocks]
-        }
 
 
 class Block(db.Model, SerializerMixin):
     __tablename__ = 'blocks'
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     type = db.Column(db.String(100), nullable=False)
     title = db.Column(db.String(100), nullable=False)
     content = db.Column(db.Text, nullable=False)
@@ -79,7 +67,7 @@ class Block(db.Model, SerializerMixin):
 class Input(db.Model):
     __tablename__ = 'inputs'
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     label = db.Column(db.String(100), nullable=False)
     value = db.Column(db.String(100))  # Add this column
     input_type = db.Column(db.String(50), nullable=False)
@@ -95,7 +83,6 @@ class Input(db.Model):
             'placeholder': self.placeholder,
             'block_id': self.block_id
         }
-
 
 
 class TextBlock(Block):
@@ -223,52 +210,4 @@ class QuoteBlock(Block):
         serialized_data = super().serialize()
         # Add quote block specific attributes to the serialized data
         serialized_data['quote_specific_attribute'] = 'quote_specific_value'
-        return serialized_data
-
-
-class DividerBlock(Block):
-    __tablename__ = 'divider_blocks'
-
-    id = db.Column(db.Integer, db.ForeignKey('blocks.id'), primary_key=True)
-    __mapper_args__ = {
-        'polymorphic_identity': 'divider_block'
-    }
-
-    def serialize(self):
-        # Serialize the divider block object to a dictionary
-        serialized_data = super().serialize()
-        # Add divider block specific attributes to the serialized data
-        serialized_data['divider_specific_attribute'] = 'divider_specific_value'
-        return serialized_data
-
-
-class CalloutBlock(Block):
-    __tablename__ = 'callout_blocks'
-
-    id = db.Column(db.Integer, db.ForeignKey('blocks.id'), primary_key=True)
-    __mapper_args__ = {
-        'polymorphic_identity': 'callout_block'
-    }
-
-    def serialize(self):
-        # Serialize the callout block object to a dictionary
-        serialized_data = super().serialize()
-        # Add callout block specific attributes to the serialized data
-        serialized_data['callout_specific_attribute'] = 'callout_specific_value'
-        return serialized_data
-
-
-class CodeBlock(Block):
-    __tablename__ = 'code_blocks'
-
-    id = db.Column(db.Integer, db.ForeignKey('blocks.id'), primary_key=True)
-    __mapper_args__ = {
-        'polymorphic_identity': 'code_block'
-    }
-
-    def serialize(self):
-        # Serialize the code block object to a dictionary
-        serialized_data = super().serialize()
-        # Add code block specific attributes to the serialized data
-        serialized_data['code_specific_attribute'] = 'code_specific_value'
         return serialized_data
