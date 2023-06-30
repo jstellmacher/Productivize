@@ -6,17 +6,79 @@ export const AppProvider = ({ children }) => {
   const [user, setUser] = useState();
   const [location, setLocation] = useState(null);
 
-  const addPage = (page) => {
-    setUser((user) => ({ ...user, pages: [...user.pages, page] }));
-    console.log(user)
+  const addPage = async (page) => {
+    try {
+      const response = await fetch("/pages", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(page),
+      });
+
+      if (response.ok) {
+        const newPage = await response.json();
+        setUser((user) => ({ ...user, pages: [...user.pages, newPage] }));
+      } else {
+        console.error("Failed to add page:", response);
+      }
+    } catch (error) {
+      console.error("Error during page addition:", error);
+    }
+  };
+
+  const removePage = async (id) => {
+    try {
+      const response = await fetch(`/pages/${id}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        setUser((user) => ({
+          ...user,
+          pages: user.pages.filter((page) => page.id !== id),
+        }));
+      } else {
+        console.error("Failed to delete page:", response);
+      }
+    } catch (error) {
+      console.error("Error during page deletion:", error);
+    }
+  };
+
+  const editPageTitle = async (pageId, newTitle) => {
+    try {
+      const response = await fetch(`/pages/${pageId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ title: newTitle }),
+      });
+
+      if (response.ok) {
+        setUser((user) => ({
+          ...user,
+          pages: user.pages.map((page) => {
+            if (page.id === pageId) {
+              return { ...page, title: newTitle };
+            }
+            return page;
+          }),
+        }));
+      } else {
+        console.error("Failed to update page title:", response);
+      }
+    } catch (error) {
+      console.error("Error during page title update:", error);
+    }
   };
 
   const checkAuthentication = async () => {
     try {
-      const isLoginPage = window.location.pathname === "/login";
-      const isSignupPage = window.location.pathname === "/signup";
+      const isLoginPage = ["/login", "/signup"].includes(window.location.pathname);
 
-      if (isLoginPage || isSignupPage) {
+      if (isLoginPage) {
         setUser(null);
         return;
       }
@@ -51,6 +113,20 @@ export const AppProvider = ({ children }) => {
     };
   }, []);
 
+  const handleLoginResponse = async (response) => {
+    try {
+      if (response.ok) {
+        const user = await response.json();
+        console.log("Login successful. User:", user); // Log the user object
+        setUser(user);
+      } else {
+        throw new Error("Login failed");
+      }
+    } catch (error) {
+      console.error("Error during login:", error);
+    }
+  };
+
   const login = async (userData) => {
     try {
       console.log("Login initiated:", userData); // Log the userData object
@@ -66,13 +142,7 @@ export const AppProvider = ({ children }) => {
 
       console.log("Login response:", response); // Log the response object
 
-      if (response.ok) {
-        const user = await response.json();
-        console.log("Login successful. User:", user); // Log the user object
-        setUser(user);
-      } else {
-        throw new Error("Login failed");
-      }
+      handleLoginResponse(response);
     } catch (error) {
       console.error("Error during login:", error);
     }
@@ -115,16 +185,10 @@ export const AppProvider = ({ children }) => {
     }
   };
 
-  const removePage = (id) => {
-    setUser((user) => ({
-      ...user,
-      pages: user.pages.filter((page) => page.id !== id),
-    }));
-  };
-
   const getBackgroundClass = () => {
     if (location) {
-      switch (location.pathname) {
+      const path = location.pathname;
+      switch (path) {
         case "/landing":
           return "bg-red-500";
         case "/login":
@@ -146,8 +210,10 @@ export const AppProvider = ({ children }) => {
   }, [user, location]);
 
   const handleAddPage = () => {
-    const newPage = { id: user.pages.length + 1, title: "New Page" };
-    addPage(newPage);
+    if (user && user.pages) {
+      const newPage = { title: "New Page" };
+      addPage({ id: user.pages.length + 1, ...newPage }); // Wrap newPage object with { id: ..., ...newPage }
+    }
   };
 
   return (
@@ -160,6 +226,7 @@ export const AppProvider = ({ children }) => {
         checkAuthentication,
         addPage,
         removePage,
+        editPageTitle,
         handleAddPage,
       }}
     >

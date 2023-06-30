@@ -96,22 +96,37 @@ class PageResource(Resource):
 
         return {'message': 'Page created successfully', 'page_id': new_page.id}, 201
 
-    def put(self, page_id):
-        # Update an existing page
+    def patch(self, page_id):
+        # Update an existing page's title
         data = request.get_json()
         title = data.get('title')
-
-        # Validate and handle page update logic
 
         page = db.session.get(Page, page_id)
         if page is None:
             return {'message': 'Page not found'}, 404
 
-        # Update the page
+        # Update the page's title
         page.title = title
         db.session.commit()
 
-        return {'message': 'Page updated successfully'}, 200
+        return {'message': 'Page title updated successfully'}, 200
+
+    # def put(self, page_id):
+    #     # Update an existing page
+    #     data = request.get_json()
+    #     title = data.get('title')
+
+    #     # Validate and handle page update logic
+
+    #     page = db.session.get(Page, page_id)
+    #     if page is None:
+    #         return {'message': 'Page not found'}, 404
+
+    #     # Update the page
+    #     page.title = title
+    #     db.session.commit()
+
+    #     return {'message': 'Page updated successfully'}, 200
 
     def delete(self, page_id):
         # Delete an existing page

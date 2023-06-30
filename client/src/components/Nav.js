@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
-import { RiHome4Line, RiPagesLine, RiLogoutCircleLine, RiLoginCircleLine, RiInformationLine } from 'react-icons/ri';
+import { RiHome4Line, RiLogoutCircleLine, RiLoginCircleLine, RiInformationLine, RiUserLine } from 'react-icons/ri';
 import { AppContext } from '../context/AppC';
 
 const Nav = () => {
@@ -24,25 +24,27 @@ const Nav = () => {
                 <span>About</span>
               </Link>
             </li>
-            {/* <li>
-              <Link
-                to="/pages"
-                className="text-white flex items-center space-x-2 hover:text-gray-300 px-3 py-2 rounded-md text-sm font-medium"
-              >
-                <RiPagesLine className="text-xl" />
-                <span>Pages</span>
-              </Link>
-            </li> */}
             {user ? (
-              <li>
-                <button
-                  onClick={logout}
-                  className="text-white flex items-center space-x-2 hover:text-gray-300 px-3 py-2 rounded-md text-sm font-medium"
-                >
-                  <RiLogoutCircleLine className="text-xl" />
-                  <span>Logout</span>
-                </button>
-              </li>
+              <>
+                <li>
+                  <Link
+                    to="/profile" // Add the link to the profile page
+                    className="text-white flex items-center space-x-2 hover:text-gray-300 px-3 py-2 rounded-md text-sm font-medium"
+                  >
+                    <RiUserLine className="text-xl" /> {/* Add the desired icon */}
+                    <span>Profile</span>
+                  </Link>
+                </li>
+                <li>
+                  <button
+                    onClick={logout}
+                    className="text-white flex items-center space-x-2 hover:text-gray-300 px-3 py-2 rounded-md text-sm font-medium"
+                  >
+                    <RiLogoutCircleLine className="text-xl" />
+                    <span>Logout</span>
+                  </button>
+                </li>
+              </>
             ) : (
               <li>
                 <Link

@@ -13,8 +13,8 @@ import Dash from "./components/Dash";
 import Forgot from "./components/Forgot";
 import { AppContext } from "./context/AppC";
 import About from "./components/About";
+import Profile from "./components/Profile"; 
 import "./index.css";
-// import Page from "./components/Page";
 
 const App = () => {
   const { user, logout } = useContext(AppContext);
@@ -51,6 +51,9 @@ const App = () => {
             </Route>
             <Route path="/about">
               <About />
+            </Route>
+            <Route path="/profile"> // Add a new route for the profile page
+              {user ? <Profile /> : <Redirect to="/login" />}
             </Route>
           </Switch>
         </div>

@@ -2,7 +2,8 @@ from sqlalchemy_serializer import SerializerMixin
 from sqlalchemy.ext.hybrid import hybrid_property
 from config import db
 from werkzeug.security import generate_password_hash, check_password_hash
-
+from datetime import datetime
+from sqlalchemy import Column, DateTime
 
 class User(db.Model, SerializerMixin):
     __tablename__ = 'users'
@@ -35,7 +36,7 @@ class Page(db.Model, SerializerMixin):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     title = db.Column(db.String(100))
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-
+    created_at = db.Column(DateTime, default=datetime.utcnow)
 
 class Block(db.Model, SerializerMixin):
     __tablename__ = 'blocks'

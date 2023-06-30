@@ -1,9 +1,3 @@
-import React, { useEffect, useState } from 'react';
-import { useDrop } from 'react-dnd';
-import { BlockTypes } from './BlockTypes';
-import { FiTrash2, FiSquare, FiCircle, FiTriangle } from 'react-icons/fi';
-import PageBlock from './PageBlock';
-
 const Page = ({ page }) => {
   const [blocks, setBlocks] = useState([]);
   const [error, setError] = useState(null);
@@ -32,14 +26,9 @@ const Page = ({ page }) => {
   };
 
   const [, drop] = useDrop({
-    accept: Object.values(BlockTypes), // Pass an array of accepted types
+    accept: Object.values(BlockTypes),
     drop: (item) => handleDrop(item.id),
   });
-  
-  // const [, drop] = useDrop({
-  //   accept: BlockTypes.BLOCK,
-  //   drop: (item) => handleDrop(item.id),
-  // });
 
   if (error) {
     return <div>Error: {error}</div>;
@@ -48,6 +37,7 @@ const Page = ({ page }) => {
   return (
     <div ref={drop} className="bg-white rounded-lg shadow p-4">
       <h3 className="text-lg font-semibold mb-4">{page.title}</h3>
+      <p className="text-sm text-gray-500 mb-2">Created at: {page.created_at}</p>
       <div className="grid grid-cols-2 gap-4">
         {blocks.length === 0 ? (
           <div className="bg-gray-200 rounded p-4">No blocks available</div>
@@ -87,58 +77,3 @@ const Page = ({ page }) => {
     </div>
   );
 };
-
-const Pages = () => {
-  const [pages, setPages] = useState([]);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    let isMounted = true; // Add a flag to track the mounted state
-
-    fetch('/pages')
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Error fetching pages');
-        }
-        return response.json();
-      })
-      .then((data) => {
-        if (isMounted) {
-          // Check if the component is still mounted before updating the state
-          console.log('API response:', data);
-          setPages(data.pages);
-          setError(null);
-        }
-      })
-      .catch((error) => {
-        console.error('Error fetching pages:', error);
-        setError(error.message);
-      });
-
-    return () => {
-      isMounted = false; // Cleanup function to update the mounted state when the component unmounts
-    };
-  }, []);
-
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
-
-  return (
-    <div className="bg-gray-100 min-h-screen py-8 px-4">
-      <h2 className="text-2xl font-bold mb-8">Pages</h2>
-      <div className="grid grid-cols-2 gap-4">
-        {pages.length === 0 ? (
-          <div className="bg-white rounded-lg shadow p-4">
-            <h3 className="text-lg font-semibold mb-4">Placeholder Page</h3>
-            <div className="bg-gray-200 rounded p-4">No blocks available</div>
-          </div>
-        ) : (
-          pages.map((page) => <Page key={page.id} page={page} />)
-        )}
-      </div>
-    </div>
-  );
-};
-
-export default Pages;
