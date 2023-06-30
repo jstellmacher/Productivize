@@ -1,4 +1,6 @@
 from flask import request, session, jsonify
+import random
+
 from flask_restful import Resource
 from config import app, api, db
 from models import User, Page, Block, TextBlock, HeadingBlock, ImageBlock
@@ -60,21 +62,25 @@ class SignUpResource(Resource):
 
 class PageResource(Resource):
     def get(self, page_id=None):
-        
         if page_id is None:
             # Get all pages
             pages = Page.query.all()
             # Serialize and return the pages
-            return pages.to_dict(), 200
+            serialized_pages = [page.to_dict() for page in pages]
+            return jsonify(serialized_pages), 200
         else:
             # Get a specific page
-            page = db.session.get(Page, page_id)
+            page = Page.query.get(page_id)
             if page is None:
                 return {'message': 'Page not found'}, 404
             # Serialize and return the page
-            return page.serialize()
+            return jsonify(page.to_dict())
 
-    def post(self, page_id):
+    def post(self, page_id=None):
+        if page_id is None:
+            # Generate a new unique page ID
+            page_id = generate_page_id()
+
         # Create a new page
         data = request.get_json()
 
@@ -165,20 +171,28 @@ class BlockResource(Resource):
 
 
 def generate_block_name(page_id):
-    # Generate the block name logic here (e.g., "block_1", "block_2", etc.)
-    # You can use a counter or any other method that suits your requirements
-    # For simplicity, let's assume a counter is used in this example
+    # Retrieve the existing block names for the given page_id
+    existing_block_names = [block.name for block in Block.query.filter_by(page_id=page_id).all()]
 
-    # Retrieve the highest block id for the given page_id
-    highest_id = Block.query.filter_by(page_id=page_id).with_entities(db.func.max(Block.id)).scalar()
+    while True:
+        # Generate a new block name (e.g., "block_1", "block_2", etc.)
+        new_id = random.randint(1, 1000)
+        new_block_name = f'block_{new_id}'
 
-    if highest_id is None:
-        # No existing blocks, start with block_1
-        return 'block_1'
-    else:
-        # Increment the highest id and return the block name
-        new_id = highest_id + 1
-        return f'block_{new_id}'
+        if new_block_name not in existing_block_names:
+            return new_block_name
+
+
+def generate_page_id():
+    # Retrieve the existing page IDs
+    existing_page_ids = [page.id for page in Page.query.all()]
+
+    new_id = random.randint(1, 1000)
+    while new_id in existing_page_ids:
+        new_id = random.randint(1, 1000)
+
+    return new_id
+
 
 
 api.add_resource(UserResource, "/users")

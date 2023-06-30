@@ -33,7 +33,7 @@ class Page(db.Model, SerializerMixin):
     __tablename__ = 'pages'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    title = db.Column(db.String(100), nullable=False)
+    title = db.Column(db.String(100))
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
 

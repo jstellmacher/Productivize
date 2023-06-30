@@ -1,8 +1,8 @@
-"""broken
+"""why is it like this
 
-Revision ID: c7ddd4b3b4a8
+Revision ID: 34a4af83e414
 Revises: 
-Create Date: 2023-06-28 16:17:14.458198
+Create Date: 2023-06-29 17:59:33.416709
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'c7ddd4b3b4a8'
+revision = '34a4af83e414'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -29,7 +29,7 @@ def upgrade():
     )
     op.create_table('pages',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
-    sa.Column('title', sa.String(length=100), nullable=False),
+    sa.Column('title', sa.String(length=100), nullable=True),
     sa.Column('user_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], name=op.f('fk_pages_user_id_users')),
     sa.PrimaryKeyConstraint('id')
