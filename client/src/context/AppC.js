@@ -15,7 +15,7 @@ export const AppProvider = ({ children }) => {
         },
         body: JSON.stringify(page),
       });
-
+  
       if (response.ok) {
         const newPage = await response.json();
         setUser((user) => ({ ...user, pages: [...user.pages, newPage] }));
@@ -26,6 +26,7 @@ export const AppProvider = ({ children }) => {
       console.error("Error during page addition:", error);
     }
   };
+  
 
   const removePage = async (id) => {
     try {

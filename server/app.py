@@ -1,5 +1,6 @@
-from flask import request, session
+from flask import request, session, jsonify
 import random
+
 from flask_restful import Resource
 from config import app, api, db
 from models import User, Page, Block, TextBlock, HeadingBlock, ImageBlock
@@ -11,12 +12,6 @@ class UserResource(Resource):
         data = request.get_json()
         username = data.get('username')
         password = data.get('password')
-
-        if not username:
-            return {'message': 'Username is required'}, 400
-
-        if not password:
-            return {'message': 'Password is required'}, 400
 
         user = User.query.filter_by(username=username).first()
 
@@ -53,15 +48,6 @@ class SignUpResource(Resource):
         password = data.get('password')
         email = data.get('email')
 
-        if not username:
-            return {'message': 'Username is required'}, 400
-
-        if not password:
-            return {'message': 'Password is required'}, 400
-
-        if User.query.filter_by(username=username).first():
-            return {'message': 'Username already exists'}, 409
-
         # Create a new user object
         new_user = User(username=username, email=email)
         new_user.password = password  # Set the password
@@ -72,6 +58,7 @@ class SignUpResource(Resource):
         session['user_id'] = new_user.id
 
         return new_user.to_dict(), 201
+
 
 class PageResource(Resource):
     def get(self, page_id=None):
@@ -108,7 +95,6 @@ class PageResource(Resource):
         db.session.commit()
 
         return {'message': 'Page created successfully', 'page_id': new_page.id}, 201
-
     def patch(self, page_id):
         # Update an existing page's title
         data = request.get_json()
@@ -123,6 +109,23 @@ class PageResource(Resource):
         db.session.commit()
 
         return {'message': 'Page title updated successfully'}, 200
+
+    # def put(self, page_id):
+    #     # Update an existing page
+    #     data = request.get_json()
+    #     title = data.get('title')
+
+    #     # Validate and handle page update logic
+
+    #     page = db.session.get(Page, page_id)
+    #     if page is None:
+    #         return {'message': 'Page not found'}, 404
+
+    #     # Update the page
+    #     page.title = title
+    #     db.session.commit()
+
+    #     return {'message': 'Page updated successfully'}, 200
 
     def delete(self, page_id):
         # Delete an existing page
@@ -144,18 +147,11 @@ class DeleteAccountResource(Resource):
         if user_id:
             user = User.query.get(user_id)
             if user:
-                # Delete associated pages before deleting the user
-                pages = Page.query.filter_by(user_id=user_id).all()
-                for page in pages:
-                    page.user_id = None
-
                 # Delete the user from the database
                 db.session.delete(user)
                 db.session.commit()
-
                 session.pop('user_id', None)
                 session.clear()
-
                 return {'message': 'Account deleted successfully'}, 200
 
         return {'message': 'User not authenticated'}, 401
@@ -229,11 +225,11 @@ def generate_page_id():
     return new_id
 
 
+
 api.add_resource(UserResource, "/users")
 api.add_resource(SignUpResource, "/signup")
 api.add_resource(PageResource, "/pages", "/pages/<int:page_id>")
 api.add_resource(BlockResource, "/pages/<int:page_id>/blocks")
-api.add_resource(DeleteAccountResource, "/accountDelete")
 
 
 if __name__ == "__main__":
