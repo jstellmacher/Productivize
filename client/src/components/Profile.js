@@ -5,6 +5,8 @@ const Profile = () => {
   const { user } = useAppContext();
   const [username, setUsername] = useState(user?.username);
   const [password, setPassword] = useState("");
+  const [error, setError] = useState(null);
+  const [data, setData] = useState(null);
 
   const handleUsernameChange = (event) => {
     setUsername(event.target.value);
@@ -19,7 +21,6 @@ const Profile = () => {
     // using the `username` and `password` state values
     // You need to implement the logic for sending the request to the backend.
 
-    // Example using fetch API:
     fetch("/users", {
       method: "PATCH",
       headers: {
@@ -33,28 +34,35 @@ const Profile = () => {
       .then((response) => response.json())
       .then((data) => {
         // Handle the response from the backend, e.g., display a success message
+        setData(data);
+        setError(null); // Reset error if request succeeds
       })
       .catch((error) => {
         // Handle error, e.g., display an error message
+        setError(error);
+        setData(null); // Reset data if request fails
       });
   };
 
-  const handleDeleteAccount = () => {
-    // Perform the DELETE request to delete the user account
-    // You need to implement the logic for sending the request to the backend.
-
-    // Example using fetch API:
-    fetch("/users", {
-      method: "DELETE",
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        // Handle the response from the backend, e.g., redirect to a login page
-      })
-      .catch((error) => {
-        // Handle error, e.g., display an error message
-      });
-  };
+  // const handleDeleteAccount = () => {
+  //   const confirmed = window.confirm("Are you sure you want to delete your account?");
+  //   if (confirmed) {
+  //     fetch("/accountDelete", {
+  //       method: "DELETE",
+  //     })
+  //       .then((response) => response.json())
+  //       .then((data) => {
+  //         // Handle the response from the backend, e.g., redirect to a login page
+  //         setData(data);
+  //         setError(null); // Reset error if request succeeds
+  //       })
+  //       .catch((error) => {
+  //         // Handle error, e.g., display an error message
+  //         setError(error);
+  //         setData(null); // Reset data if request fails
+  //       });
+  //   }
+  // };
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
@@ -62,7 +70,6 @@ const Profile = () => {
         <h1 className="text-2xl font-bold mb-4">Profile</h1>
         <div className="flex justify-center items-center mb-8">
           <img
-            // src={user?.profilePicture}
             src={"https://picsum.photos/200/303"}
             alt="Profile"
             className="rounded-full h-50 w-50 mr-4"
@@ -117,9 +124,11 @@ const Profile = () => {
         <button className="bg-indigo-500 text-white rounded-md px-4 py-2" onClick={handleSaveProfile}>
           Save Profile
         </button>
-        <button className="bg-red-500 text-white rounded-md px-4 py-2" onClick={handleDeleteAccount}>
+        {/* <button className="bg-red-500 text-white rounded-md px-4 py-2" onClick={handleDeleteAccount}>
           Delete Account
-        </button>
+        </button> */}
+        {error && <p className="text-red-500 mt-4">{error.message}</p>}
+        {data && <p className="text-green-500 mt-4">Request successful!</p>}
       </div>
     </div>
   );

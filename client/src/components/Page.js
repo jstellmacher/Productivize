@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useDrop } from "react-dnd";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 import { BlockTypes } from "./BlockTypes";
 import { FiTrash2, FiSquare, FiCircle, FiTriangle } from "react-icons/fi";
 import PageBlock from "./PageBlock";
@@ -8,6 +10,7 @@ import { useParams } from "react-router-dom";
 const Page = () => {
   const [page, setPage] = useState();
   const [error, setError] = useState(null);
+  const [selectedBlockType, setSelectedBlockType] = useState(null);
   const { id } = useParams();
 
   useEffect(() => {
@@ -20,7 +23,6 @@ const Page = () => {
       })
       .then((data) => {
         console.log("API response:", data);
-        // setBlocks(data.blocks);
         setPage(data);
         setError(null);
       })
@@ -30,14 +32,40 @@ const Page = () => {
       });
   }, [id]);
 
-  const handleDrop = (blockId) => {
-    console.log(`Block ${blockId} dropped on Page ${page.id}`);
+  const handleDrop = (item, blockId) => {
+    if (blockId === "trash") {
+      console.log(`Block ${item.type} deleted`);
+      setPage((prevPage) => ({
+        ...prevPage,
+        blocks: prevPage.blocks.filter((block) => block.id !== item.id),
+      }));
+    } else {
+      console.log(`Block ${item.type} dropped on Page ${page.id}`);
+      const newBlock = {
+        id: item.id,
+        type: item.type,
+        // Add any additional properties or data for the new block as needed
+      };
+      setPage((prevPage) => ({
+        ...prevPage,
+        blocks: [...prevPage.blocks, newBlock],
+      }));
+    }
   };
 
   const [, drop] = useDrop({
     accept: Object.values(BlockTypes),
-    drop: (item) => handleDrop(item.id),
+    drop: (item) => handleDrop(item, "page"),
   });
+
+  const handleIconClick = (blockType) => {
+    setSelectedBlockType(blockType);
+  };
+
+  const handleIconDragStart = (event, blockType) => {
+    event.preventDefault(); // Prevent default behavior
+    event.dataTransfer.setData("text/plain", blockType);
+  };
 
   if (error) {
     return <div>Error: {error}</div>;
@@ -47,45 +75,73 @@ const Page = () => {
   }
 
   return (
-    <div ref={drop} className="bg-white rounded-lg shadow p-4">
-      <h3 className="text-lg font-semibold mb-4">{page.title}</h3>
-      <div className="grid grid-cols-2 gap-4">
-        {page.blocks.length === 0 ? (
-          <div className="bg-gray-200 rounded p-4">No blocks available</div>
-        ) : (
-          page.blocks.map((block) => (
-            <PageBlock
-              key={block.id}
-              block={block}
-              blockType={block.type}
-              onDrop={() => handleDrop(block.id)}
-            />
-          ))
-        )}
-      </div>
-      <div className="lock-to-grid bg-white rounded-lg shadow-xl p-4 mt-4">
-        <div className="inner-grid bg-gray-100 rounded-lg p-4 shadow-2xl">
-          {/* Grid lines or any other design elements for the lock-to-grid area */}
+    <DndProvider backend={HTML5Backend}>
+      <div ref={drop} className="bg-gray-400 rounded-lg shadow p-4 min-h-screen">
+        <h3 className="text-lg font-semibold mb-4">{page.title}</h3>
+        <div className="grid grid-cols-2 gap-4">
+          {page.blocks.length === 0 ? (
+            <div className="bg-gray-200 rounded p-4">No blocks available</div>
+          ) : (
+            page.blocks.map((block) => (
+              <PageBlock
+                key={block.id}
+                block={block}
+                blockType={block.type}
+                onDrop={() => handleDrop(block, "trash")}
+              />
+            ))
+          )}
+        </div>
+        <div className="lock-to-grid bg-gray-200 rounded-lg shadow-xl p-4 mt-4">
+          <div className="inner-grid" style={{ minHeight: "80vh" }}>
+            {/* Grid lines or any other design elements for the lock-to-grid area */}
+          </div>
+        </div>
+        <div className="flex items-center mt-4">
+          <div
+            className={`flex items-center justify-center h-8 w-8 rounded-full ${
+              selectedBlockType === BlockTypes.TEXT ? "bg-red-500 text-white" : "bg-gray-200 text-gray-600"
+            } cursor-pointer`}
+            title="Text Block"
+            onClick={() => handleIconClick(BlockTypes.TEXT)}
+            draggable
+            onDragStart={(event) => handleIconDragStart(event, BlockTypes.TEXT)}
+          >
+            <FiSquare size={16} />
+          </div>
+          <div
+            className={`flex items-center justify-center h-8 w-8 rounded-full ${
+              selectedBlockType === BlockTypes.HEADING ? "bg-red-500 text-white" : "bg-gray-200 text-gray-600"
+            } cursor-pointer ml-2`}
+            title="Heading Block"
+            onClick={() => handleIconClick(BlockTypes.HEADING)}
+            draggable
+            onDragStart={(event) => handleIconDragStart(event, BlockTypes.HEADING)}
+          >
+            <FiCircle size={16} />
+          </div>
+          <div
+            className={`flex items-center justify-center h-8 w-8 rounded-full ${
+              selectedBlockType === BlockTypes.TRIANGLE ? "bg-red-500 text-white" : "bg-gray-200 text-gray-600"
+            } cursor-pointer ml-2`}
+            title="Triangle Block"
+            onClick={() => handleIconClick(BlockTypes.TRIANGLE)}
+            draggable
+            onDragStart={(event) => handleIconDragStart(event, BlockTypes.TRIANGLE)}
+          >
+            <FiTriangle size={16} />
+          </div>
+          <div
+            className="flex items-center justify-center h-8 w-8 rounded-full bg-red-500 text-white cursor-pointer ml-2"
+            title="Trash Bin"
+            onDrop={(event) => handleDrop({}, "trash")}
+            onDragOver={(event) => event.preventDefault()}
+          >
+            <FiTrash2 size={16} />
+          </div>
         </div>
       </div>
-      <div className="flex items-center mt-4">
-        <div
-          className="flex items-center justify-center h-8 w-8 rounded-full bg-red-500 text-white cursor-pointer"
-          title="Trash Bin"
-        >
-          <FiTrash2 size={16} />
-        </div>
-        <div className="flex items-center justify-center h-8 w-8 rounded-full bg-gray-200 text-gray-600 ml-2">
-          <FiSquare size={16} />
-        </div>
-        <div className="flex items-center justify-center h-8 w-8 rounded-full bg-gray-200 text-gray-600 ml-2">
-          <FiCircle size={16} />
-        </div>
-        <div className="flex items-center justify-center h-8 w-8 rounded-full bg-gray-200 text-gray-600 ml-2">
-          <FiTriangle size={16} />
-        </div>
-      </div>
-    </div>
+    </DndProvider>
   );
 };
 

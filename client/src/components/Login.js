@@ -7,14 +7,35 @@ const Login = () => {
   const { login } = useContext(AppContext);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [errors, setErrors] = useState({});
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const userData = {
-      username: username,
-      password: password,
-    };
-    login(userData);
+
+    const validationErrors = validateForm();
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+    } else {
+      const userData = {
+        username: username,
+        password: password,
+      };
+      login(userData);
+    }
+  };
+
+  const validateForm = () => {
+    const errors = {};
+
+    if (username.trim() === '') {
+      errors.username = 'Username is required';
+    }
+
+    if (password.trim() === '') {
+      errors.password = 'Password is required';
+    }
+
+    return errors;
   };
 
   return (
@@ -27,7 +48,7 @@ const Login = () => {
               <label htmlFor="username" className="block text-lg font-medium text-gray-700">
                 Username
               </label>
-              <div className="flex items-center bg-white border border-blue-500 rounded-lg shadow-sm">
+              <div className={`flex items-center bg-white border border-blue-500 rounded-lg shadow-sm ${errors.username ? 'border-red-500' : ''}`}>
                 <span className="text-gray-500 mx-2">
                   <FiMail />
                 </span>
@@ -41,12 +62,13 @@ const Login = () => {
                   className="w-full py-2 px-4 outline-none text-lg"
                 />
               </div>
+              {errors.username && <p className="text-red-500 text-sm mt-1">{errors.username}</p>}
             </div>
             <div className="mb-4">
               <label htmlFor="password" className="block text-lg font-medium text-gray-700">
                 Password
               </label>
-              <div className="flex items-center bg-white border border-blue-500 rounded-lg shadow-sm">
+              <div className={`flex items-center bg-white border border-blue-500 rounded-lg shadow-sm ${errors.password ? 'border-red-500' : ''}`}>
                 <span className="text-gray-500 mx-2">
                   <FiLock />
                 </span>
@@ -60,6 +82,7 @@ const Login = () => {
                   className="w-full py-2 px-4 outline-none text-lg"
                 />
               </div>
+              {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
             </div>
             <div className="flex items-center justify-start">
               <button
