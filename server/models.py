@@ -14,8 +14,7 @@ class User(db.Model, SerializerMixin):
     email = db.Column(db.String(100), unique=True, nullable=False)
     pages = db.relationship('Page', backref='user', lazy=True)
 
-    serialize_rules = ("-_password_hash", "-pages.user","-pages.user",)
-
+    serialize_rules = ("-_password_hash", "-pages.user", "-pages.user",)
 
     @hybrid_property
     def password(self):
@@ -47,6 +46,7 @@ class Page(db.Model, SerializerMixin):
     created_at = db.Column(DateTime, default=datetime.utcnow)
 
     blocks = db.relationship('Block', backref='page')
+
     def serialize(self):
         return {
             'id': self.id,

@@ -12,6 +12,12 @@ class UserResource(Resource):
         username = data.get('username')
         password = data.get('password')
 
+        if not username:
+            return {'message': 'Username is required'}, 400
+
+        if not password:
+            return {'message': 'Password is required'}, 400
+
         user = User.query.filter_by(username=username).first()
 
         if user and user.check_password(password):
@@ -47,6 +53,15 @@ class SignUpResource(Resource):
         password = data.get('password')
         email = data.get('email')
 
+        if not username:
+            return {'message': 'Username is required'}, 400
+
+        if not password:
+            return {'message': 'Password is required'}, 400
+
+        if User.query.filter_by(username=username).first():
+            return {'message': 'Username already exists'}, 409
+
         # Create a new user object
         new_user = User(username=username, email=email)
         new_user.password = password  # Set the password
@@ -57,7 +72,6 @@ class SignUpResource(Resource):
         session['user_id'] = new_user.id
 
         return new_user.to_dict(), 201
-
 
 class PageResource(Resource):
     def get(self, page_id=None):
