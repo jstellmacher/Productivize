@@ -8,15 +8,10 @@ const About = () => {
           <div>
             <h2 className="text-3xl font-bold text-gray-800 mb-4">About Us</h2>
             <p className="text-gray-600">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin
-              imperdiet purus ac consequat maximus. Sed elementum luctus tellus,
-              nec efficitur erat rutrum sed.
+              Productivize is a web application that empowers users with productivity and note-taking tools, task management, project tracking, and collaboration capabilities, offering a unique blend of functionality and personalized features.
             </p>
             <p className="text-gray-600 mt-4">
-              Mauris rhoncus tempor purus, a lacinia nisl auctor sed. Mauris
-              cursus ornare libero non tincidunt. Vivamus vel tincidunt nunc, et
-              pharetra nunc. Donec pharetra, dolor in fringilla faucibus, sem
-              purus porta ex, nec sagittis arcu purus nec ex.
+              Productivize is a web application designed to provide users with a versatile platform for organizing their work, managing tasks and projects, and collaborating with others. With a touch of personalization and innovative features, Productivize aims to enhance the user experience and boost productivity.
             </p>
             <div className="flex items-center mt-4">
               <div className="w-20 h-20 rounded-full overflow-hidden">

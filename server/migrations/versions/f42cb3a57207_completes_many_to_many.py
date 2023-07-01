@@ -1,8 +1,8 @@
-"""brain pops
+"""completes many to many
 
-Revision ID: 78f9f678f5d5
+Revision ID: f42cb3a57207
 Revises: 
-Create Date: 2023-06-30 00:06:15.573578
+Create Date: 2023-07-01 14:16:35.573449
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '78f9f678f5d5'
+revision = 'f42cb3a57207'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -43,6 +43,12 @@ def upgrade():
     sa.Column('page_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['page_id'], ['pages.id'], name=op.f('fk_blocks_page_id_pages')),
     sa.PrimaryKeyConstraint('id')
+    )
+    op.create_table('users_pages',
+    sa.Column('user_id', sa.Integer(), nullable=True),
+    sa.Column('page_id', sa.Integer(), nullable=True),
+    sa.ForeignKeyConstraint(['page_id'], ['pages.id'], name=op.f('fk_users_pages_page_id_pages')),
+    sa.ForeignKeyConstraint(['user_id'], ['users.id'], name=op.f('fk_users_pages_user_id_users'))
     )
     op.create_table('bulleted_list_blocks',
     sa.Column('id', sa.Integer(), nullable=False),
@@ -108,6 +114,7 @@ def downgrade():
     op.drop_table('image_blocks')
     op.drop_table('heading_blocks')
     op.drop_table('bulleted_list_blocks')
+    op.drop_table('users_pages')
     op.drop_table('blocks')
     op.drop_table('pages')
     op.drop_table('users')

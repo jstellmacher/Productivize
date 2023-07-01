@@ -3,7 +3,14 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from config import db
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
-from sqlalchemy import Column, DateTime
+from sqlalchemy import Column, DateTime, Table, ForeignKey
+
+
+
+users_pages = Table('users_pages', db.Model.metadata,
+                    Column('user_id', db.Integer, ForeignKey('users.id')),
+                    Column('page_id', db.Integer, ForeignKey('pages.id'))
+                    )
 
 class User(db.Model, SerializerMixin):
     __tablename__ = 'users'
@@ -12,7 +19,8 @@ class User(db.Model, SerializerMixin):
     username = db.Column(db.String(100), unique=True, nullable=False)
     _password_hash = db.Column('password_hash', db.String(128))
     email = db.Column(db.String(100), unique=True, nullable=False)
-    pages = db.relationship('Page', backref='user', lazy=True)
+    pages = db.relationship('Page', secondary=users_pages, backref='users', lazy='dynamic')
+
 
     serialize_rules = ("-_password_hash", "-pages.user", "-pages.user",)
 
