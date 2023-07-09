@@ -1,9 +1,9 @@
 from flask import request, session, jsonify
 import random
-
+from datetime import datetime
 from flask_restful import Resource
 from config import app, api, db
-from models import User, Page, Block, TextBlock, HeadingBlock, ImageBlock
+from models import User, Page, Block, TextBlock, HeadingBlock, ImageBlock, CalendarEvent
 from werkzeug.security import generate_password_hash, check_password_hash
 
 class UserResource(Resource):
@@ -224,7 +224,65 @@ def generate_page_id():
 
     return new_id
 
+class CalendarEventResource(Resource):
+    def get(self, event_id=None):
+        if event_id is None:
+            # Get all events
+            events = CalendarEvent.query.all()
+            # Serialize and return the events
+            serialized_events = [event.serialize() for event in events]
+            return serialized_events, 200
+        else:
+            # Get a specific event
+            event = db.session.get(CalendarEvent, event_id)
+            if event:
+                return event.serialize(), 200
+            else:
+                return {'message': 'Event not found'}, 404
 
+    def post(self):
+        data = request.get_json()
+        title = data.get('title')
+        start = datetime.strptime(data.get('start'), '%Y-%m-%dT%H:%M:%S.%fZ')
+        end = datetime.strptime(data.get('end'), '%Y-%m-%dT%H:%M:%S.%fZ')
+        user_id = data.get('user_id')
+
+        new_event = CalendarEvent(title=title, start=start, end=end, user_id=user_id)
+
+        db.session.add(new_event)
+        db.session.commit()
+
+        return new_event.serialize(), 201
+
+    def patch(self, event_id):
+        event = db.session.get(CalendarEvent, event_id)
+        if event:
+            data = request.get_json()
+            if 'title' in data:
+                event.title = data.get('title')
+            if 'start' in data:
+                event.start = datetime.strptime(data.get('start'), '%Y-%m-%dT%H:%M:%S.%fZ')
+            if 'end' in data:
+                event.end = datetime.strptime(data.get('end'), '%Y-%m-%dT%H:%M:%S.%fZ')
+            if 'user_id' in data:
+                event.user_id = data.get('user_id')
+
+            db.session.commit()
+
+            return event.serialize(), 200
+
+    def delete(self, event_id):
+        event = db.session.get(CalendarEvent, event_id)
+        if event:
+            db.session.delete(event)
+            db.session.commit()
+            return {'message': 'Event deleted'}, 200
+        else:
+            return {'message': 'Event not found'}, 404
+
+
+
+api.add_resource(CalendarEventResource, '/events', '/events/<int:event_id>')
 
 api.add_resource(UserResource, "/users")
 api.add_resource(SignUpResource, "/signup")

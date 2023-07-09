@@ -16,10 +16,10 @@ const Dash = () => {
     let sortedPages = Array.isArray(user?.pages)
       ? [...user.pages]
       : [
-        { id: 1, title: "Example Page 1", created_at: new Date() },
-        { id: 2, title: "Page 2", created_at: new Date() },
+          { id: 1, title: "Example Page 1", created_at: new Date() },
+          { id: 2, title: "Page 2", created_at: new Date() },
         ];
-
+  
     sortedPages.sort((a, b) => {
       if (filterOldestFirst) {
         return new Date(a.created_at) - new Date(b.created_at);
@@ -27,9 +27,10 @@ const Dash = () => {
         return new Date(b.created_at) - new Date(a.created_at);
       }
     });
-
+  
     setPages(sortedPages);
   }, [user, filterOldestFirst]);
+  
 
   const handleAddPage = () => {
     const newPage = { title: "New Page" };
@@ -106,7 +107,7 @@ const Dash = () => {
             </div>
           </div>
   
-          {pages.map((page) => (
+          {user.pages.map((page) => (
             <div key={page.id}>
               <div
                 className="relative bg-white rounded-lg shadow-xl cursor-pointer flex flex-col justify-center w-40 h-40 sm:w-56 sm:h-56 hover:bg-blue-200"

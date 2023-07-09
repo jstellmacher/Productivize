@@ -6,7 +6,6 @@ from datetime import datetime
 from sqlalchemy import Column, DateTime
 
 
-
 class User(db.Model, SerializerMixin):
     __tablename__ = 'users'
 
@@ -15,6 +14,7 @@ class User(db.Model, SerializerMixin):
     _password_hash = db.Column('password_hash', db.String(128))
     email = db.Column(db.String(100), unique=True, nullable=False)
     pages = db.relationship('Page', backref='user', lazy=True)
+    events = db.relationship('CalendarEvent', backref='user', lazy=True)
 
     serialize_rules = ("-_password_hash", "-pages.user", "-pages.user",)
 
@@ -37,6 +37,25 @@ class User(db.Model, SerializerMixin):
             'username': self.username,
             'email': self.email
         }
+
+
+class CalendarEvent(db.Model):
+    __tablename__ = 'calendar_events'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    title = db.Column(db.String(100), nullable=False)
+    start = db.Column(db.DateTime, nullable=False)
+    end = db.Column(db.DateTime, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'title': self.title,
+            'start': self.start.isoformat(),
+            'end': self.end.isoformat(),
+            'user_id': self.user_id
+        } 
 
 
 class Page(db.Model, SerializerMixin):

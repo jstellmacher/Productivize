@@ -1,8 +1,8 @@
-"""completes many to many
+"""Add shared_user_id column to calendar_events table
 
-Revision ID: f42cb3a57207
+Revision ID: 188f6ae5a5c6
 Revises: 
-Create Date: 2023-07-01 14:16:35.573449
+Create Date: 2023-07-09 01:24:29.679175
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'f42cb3a57207'
+revision = '188f6ae5a5c6'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -26,6 +26,15 @@ def upgrade():
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('email'),
     sa.UniqueConstraint('username')
+    )
+    op.create_table('calendar_events',
+    sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
+    sa.Column('title', sa.String(length=100), nullable=False),
+    sa.Column('start', sa.DateTime(), nullable=False),
+    sa.Column('end', sa.DateTime(), nullable=False),
+    sa.Column('user_id', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['user_id'], ['users.id'], name=op.f('fk_calendar_events_user_id_users')),
+    sa.PrimaryKeyConstraint('id')
     )
     op.create_table('pages',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
@@ -43,12 +52,6 @@ def upgrade():
     sa.Column('page_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['page_id'], ['pages.id'], name=op.f('fk_blocks_page_id_pages')),
     sa.PrimaryKeyConstraint('id')
-    )
-    op.create_table('users_pages',
-    sa.Column('user_id', sa.Integer(), nullable=True),
-    sa.Column('page_id', sa.Integer(), nullable=True),
-    sa.ForeignKeyConstraint(['page_id'], ['pages.id'], name=op.f('fk_users_pages_page_id_pages')),
-    sa.ForeignKeyConstraint(['user_id'], ['users.id'], name=op.f('fk_users_pages_user_id_users'))
     )
     op.create_table('bulleted_list_blocks',
     sa.Column('id', sa.Integer(), nullable=False),
@@ -114,8 +117,8 @@ def downgrade():
     op.drop_table('image_blocks')
     op.drop_table('heading_blocks')
     op.drop_table('bulleted_list_blocks')
-    op.drop_table('users_pages')
     op.drop_table('blocks')
     op.drop_table('pages')
+    op.drop_table('calendar_events')
     op.drop_table('users')
     # ### end Alembic commands ###

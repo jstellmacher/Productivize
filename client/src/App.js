@@ -15,6 +15,7 @@ import { AppContext } from "./context/AppC";
 import About from "./components/About";
 import Profile from "./components/Profile";
 import Page from "./components/Page"; // Import the Page component
+import Schedule from "./components/Schedule"; // Import the Schedule component
 import "./index.css";
 
 const App = () => {
@@ -57,9 +58,10 @@ const App = () => {
               {user ? <Profile /> : <Redirect to="/login" />}
             </Route>
             <Route path="/page/:id">
-              {" "}
-              {/* Add a dynamic parameter for page ID */}
               <Page />
+            </Route>
+            <Route path="/schedule">
+              {user ? <Schedule /> : <Redirect to="/login" />}
             </Route>
           </Switch>
         </div>

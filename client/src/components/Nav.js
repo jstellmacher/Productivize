@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
-import { RiHome4Line, RiLogoutCircleLine, RiLoginCircleLine, RiInformationLine, RiUserLine } from 'react-icons/ri';
+import { RiHome4Line, RiLogoutCircleLine, RiLoginCircleLine, RiInformationLine, RiUserLine, RiCalendarLine } from 'react-icons/ri';
 import { AppContext } from '../context/AppC';
 
 const Nav = () => {
@@ -24,14 +24,23 @@ const Nav = () => {
                 <span>About</span>
               </Link>
             </li>
+            <li>
+              <Link
+                to="/schedule"
+                className="text-white flex items-center space-x-2 hover:text-gray-300 px-3 py-2 rounded-md text-sm font-medium"
+              >
+                <RiCalendarLine className="text-xl" />
+                <span>Schedule</span>
+              </Link>
+            </li>
             {user ? (
               <>
                 <li>
                   <Link
-                    to="/profile" // Add the link to the profile page
+                    to="/profile"
                     className="text-white flex items-center space-x-2 hover:text-gray-300 px-3 py-2 rounded-md text-sm font-medium"
                   >
-                    <RiUserLine className="text-xl" /> {/* Add the desired icon */}
+                    <RiUserLine className="text-xl" />
                     <span>Profile</span>
                   </Link>
                 </li>
