@@ -3,14 +3,15 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from config import db
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
-from sqlalchemy import DateTime, Table, Column, Integer, ForeignKey, String
+from sqlalchemy import DateTime, Column, Integer, ForeignKey, String, Table
 from sqlalchemy.orm import relationship
 
-# Define the join table for the many-to-many relationship
-user_calendar_event_association = Table('user_calendar_event_association', db.Model.metadata,
-    Column('user_id', Integer, ForeignKey('users.id')),
-    Column('calendar_event_id', Integer, ForeignKey('calendar_events.id'))
+user_calendar_event_association = db.Table(
+    'user_calendar_event_association',
+    db.Column('user_id', db.Integer, db.ForeignKey('users.id'), primary_key=True),
+    db.Column('calendar_event_id', db.Integer, db.ForeignKey('calendar_events.id'), primary_key=True)
 )
+
 
 class User(db.Model, SerializerMixin):
     __tablename__ = 'users'
@@ -20,7 +21,6 @@ class User(db.Model, SerializerMixin):
     _password_hash = db.Column('password_hash', db.String(128))
     email = db.Column(db.String(100), unique=True, nullable=False)
     pages = db.relationship('Page', backref='user', lazy=True)
-    events = db.relationship('CalendarEvent', secondary=user_calendar_event_association, backref='user_events', lazy=True)
     profile_picture = Column(String(255))
 
     serialize_rules = ("-_password_hash", "-pages.user", "-pages.user",)
@@ -45,6 +45,7 @@ class User(db.Model, SerializerMixin):
             'email': self.email
         }
 
+
 class CalendarEvent(db.Model):
     __tablename__ = 'calendar_events'
 
@@ -52,7 +53,15 @@ class CalendarEvent(db.Model):
     title = db.Column(db.String(100), nullable=False)
     start = db.Column(db.DateTime, nullable=False)
     end = db.Column(db.DateTime, nullable=False)
-    users = db.relationship('User', secondary=user_calendar_event_association, backref='user_calendar_events', lazy=True)
+    created_by = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+
+    users = db.relationship('User', secondary=user_calendar_event_association, backref='calendar_events')
+
+    def __init__(self, title, start, end, created_by):
+        self.title = title
+        self.start = start
+        self.end = end
+        self.created_by = created_by
 
     def serialize(self):
         return {
@@ -71,8 +80,12 @@ class CalendarEvent(db.Model):
             'start': self.start.strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
             'end': self.end.strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
             'users': [user.serialize() for user in self.users],
-            'username': [user.username for user in self.users]
+            'username': [user.username for user in self.users] if self.users else []
         }
+
+
+
+
 
 
 
