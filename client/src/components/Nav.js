@@ -10,7 +10,7 @@ const Nav = () => {
     <nav className="bg-gray-800 py-4">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center">
-          <Link to="/" className="text-white flex items-center space-x-2">
+          <Link to="/dash" className="text-white flex items-center space-x-2">
             <RiHome4Line className="text-xl" />
             <span className="text-sm font-medium">Home</span>
           </Link>
@@ -41,7 +41,7 @@ const Nav = () => {
                     className="text-white flex items-center space-x-2 hover:text-gray-300 px-3 py-2 rounded-md text-sm font-medium"
                   >
                     <RiUserLine className="text-xl" />
-                    <span>Profile</span>
+                    <span>{user.username}</span>
                   </Link>
                 </li>
                 <li>

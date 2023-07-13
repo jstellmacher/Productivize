@@ -3,8 +3,14 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from config import db
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
-from sqlalchemy import Column, DateTime
+from sqlalchemy import DateTime, Table, Column, Integer, ForeignKey, String
+from sqlalchemy.orm import relationship
 
+# Define the join table for the many-to-many relationship
+user_calendar_event_association = Table('user_calendar_event_association', db.Model.metadata,
+    Column('user_id', Integer, ForeignKey('users.id')),
+    Column('calendar_event_id', Integer, ForeignKey('calendar_events.id'))
+)
 
 class User(db.Model, SerializerMixin):
     __tablename__ = 'users'
@@ -14,7 +20,8 @@ class User(db.Model, SerializerMixin):
     _password_hash = db.Column('password_hash', db.String(128))
     email = db.Column(db.String(100), unique=True, nullable=False)
     pages = db.relationship('Page', backref='user', lazy=True)
-    events = db.relationship('CalendarEvent', backref='user', lazy=True)
+    events = db.relationship('CalendarEvent', secondary=user_calendar_event_association, backref='user_events', lazy=True)
+    profile_picture = Column(String(255))
 
     serialize_rules = ("-_password_hash", "-pages.user", "-pages.user",)
 
@@ -38,7 +45,6 @@ class User(db.Model, SerializerMixin):
             'email': self.email
         }
 
-
 class CalendarEvent(db.Model):
     __tablename__ = 'calendar_events'
 
@@ -46,7 +52,7 @@ class CalendarEvent(db.Model):
     title = db.Column(db.String(100), nullable=False)
     start = db.Column(db.DateTime, nullable=False)
     end = db.Column(db.DateTime, nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    users = db.relationship('User', secondary=user_calendar_event_association, backref='user_calendar_events', lazy=True)
 
     def serialize(self):
         return {
@@ -54,8 +60,23 @@ class CalendarEvent(db.Model):
             'title': self.title,
             'start': self.start.isoformat(),
             'end': self.end.isoformat(),
-            'user_id': self.user_id
-        } 
+            'users': [user.serialize() for user in self.users],
+            'username': [user.username for user in self.users]
+        }
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'title': self.title,
+            'start': self.start.strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
+            'end': self.end.strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
+            'users': [user.serialize() for user in self.users],
+            'username': [user.username for user in self.users]
+        }
+
+
+
+ 
 
 
 class Page(db.Model, SerializerMixin):

@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
+import UserInvite from './UserInvite';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 
 const localizer = momentLocalizer(moment);
@@ -9,34 +10,37 @@ const Schedule = () => {
   const [events, setEvents] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [userId, setUserId] = useState(null); // Add user ID state
-  const [users, setUsers] = useState([]); // Add users state
-  const [sharedUserId, setSharedUserId] = useState(null);
+  const [invitedUsers, setInvitedUsers] = useState([]); // Track invited users
 
-  const fetchEvents = useCallback(() => {
-    fetch(`/events?user_id=${userId}`)
+const fetchEvents = useCallback(() => {
+  const user = getUser();
+  if (user) {
+    fetch(`/events?user_id=${user.id}`)
       .then(response => response.json())
       .then(data => {
         const editableEvents = data.map(event => ({
           ...event,
-          isEditable: true // Since the events belong to the current user, they are always editable
+          isEditable: true,
+          username: event.users.length > 0 ? event.users[0].username : "Unknown User"
         }));
         setEvents(editableEvents);
       })
       .catch(error => {
         console.error('Error:', error);
       });
-  }, [userId]);
+  }
+}, []);
 
-  useEffect(() => {
-    // Set the user ID from your authentication system
-    const user = getUser(); // Replace this with your authentication code
-    if (user) {
-      setUserId(user.id);
-    }
+useEffect(() => {
+  const user = getUser();
+  if (user) {
+    setUserId(user.id);
+  }
 
-    fetchEvents();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fetchEvents]);
+  fetchEvents();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [fetchEvents]);
+
 
   const getUser = () => {
     // Replace this with your actual user authentication logic
@@ -46,20 +50,37 @@ const Schedule = () => {
     };
   };
 
-  const handleInviteUsers = invitedUsers => {
-    // Perform any actions needed when users are invited
-    console.log('Invited users:', invitedUsers);
-    setSharedUserId(invitedUsers);
-  };
-
   const handleEventSelect = event => {
     if (event.isEditable) {
       setSelectedEvent(event);
     }
   };
 
+  const handleInviteUser = user => {
+    if (selectedEvent && selectedEvent.id) {
+      const updatedEvent = { ...selectedEvent };
+      updatedEvent.user_ids = updatedEvent.user_ids || [];
+      updatedEvent.user_ids.push(user.id);
+
+      fetch(`/events/${selectedEvent.id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(updatedEvent)
+      })
+        .then(response => response.json())
+        .then(data => {
+          console.log('Event updated:', data);
+          fetchEvents(); // Refresh events after update
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
+    }
+  };
+
   const handleEventDrop = event => {
-    // Handle event drop logic
     console.log('Dropped event:', event);
     const { id, start, end } = event;
     const updatedEvent = { id, start, end };
@@ -81,7 +102,6 @@ const Schedule = () => {
   };
 
   const handleEventResize = event => {
-    // Handle event resize logic
     console.log('Resized event:', event);
     const { id, start, end } = event;
     const updatedEvent = { id, start, end };
@@ -109,9 +129,9 @@ const Schedule = () => {
         title,
         start,
         end,
-        user_id: userId
+        user_ids: [userId]
       };
-  
+
       fetch('/events', {
         method: 'POST',
         headers: {
@@ -129,7 +149,6 @@ const Schedule = () => {
         });
     }
   };
-  
 
   const handleConfirmDelete = () => {
     if (selectedEvent) {
@@ -164,7 +183,7 @@ const Schedule = () => {
           end,
           title: updatedTitle
         };
-  
+
         fetch(`/events/${id}`, {
           method: 'PATCH',
           headers: {
@@ -186,6 +205,7 @@ const Schedule = () => {
 
   return (
     <div style={{ height: '500px' }}>
+      <UserInvite onInvite={handleInviteUser} />
 
       <Calendar
         localizer={localizer}
@@ -198,11 +218,9 @@ const Schedule = () => {
         onEventResize={handleEventResize}
         onSelectSlot={handleSelectSlot}
         style={{ margin: '50px' }}
-        views={['month', 'week', 'day', 'agenda']} // Add views prop
-        defaultView="month" // Set the default view
+        defaultView="month"
       />
 
-      {/* Confirmation Dialog */}
       {selectedEvent && (
         <div className="confirmation-dialog">
           <h3>Confirm Event Deletion</h3>
@@ -220,6 +238,15 @@ const Schedule = () => {
           </button>
         </div>
       )}
+
+      {/* Print the events with the username */}
+      <div>
+        {events.map(event => (
+          <div key={event.id}>
+            <span>{event.title} - Created by: {event.username}</span>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

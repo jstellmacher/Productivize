@@ -1,10 +1,13 @@
 from flask import request, session, jsonify
 import random
-from datetime import datetime
+from datetime import datetime, timezone
 from flask_restful import Resource
 from config import app, api, db
-from models import User, Page, Block, TextBlock, HeadingBlock, ImageBlock, CalendarEvent
+from models import User, Page, Block, TextBlock, HeadingBlock, ImageBlock, CalendarEvent, user_calendar_event_association
 from werkzeug.security import generate_password_hash, check_password_hash
+from dateutil.parser import parse
+from werkzeug.utils import secure_filename
+import os
 
 class UserResource(Resource):
     def post(self):
@@ -38,6 +41,71 @@ class UserResource(Resource):
                 return user.to_dict(), 200
 
         return {'message': 'User not authenticated'}, 401
+
+    def patch(self):
+        user_id = session.get('user_id')
+        if not user_id:
+            return {'message': 'User not authenticated'}, 401
+
+        user = User.query.get(user_id)
+        if not user:
+            return {'message': 'User not found'}, 404
+
+        username = request.json.get('username')
+        password = request.json.get('password')
+        profile_picture = request.json.get('profilePicture')
+
+        if username:
+            user.username = username
+
+        if password:
+            user.password = password
+
+        if profile_picture:
+            # Save the profile picture file to a desired directory
+            filename = secure_filename(profile_picture)
+            # Add the code to save the file or update the user's profile picture field
+            user.profile_picture = filename
+
+        db.session.commit()
+
+        return user.to_dict(), 200
+
+
+
+
+# class UserResource(Resource):
+#     def post(self):
+#         # User login
+#         data = request.get_json()
+#         username = data.get('username')
+#         password = data.get('password')
+
+#         user = User.query.filter_by(username=username).first()
+
+#         if user and user.check_password(password):
+#             # Login successful
+#             session['user_id'] = user.id
+#             return user.to_dict(), 200
+#         else:
+#             # Login failed
+#             return {'message': 'Invalid username or password'}, 401
+
+#     def delete(self):
+#         # User logout
+#         session.pop('user_id', None)
+#         session.clear()
+#         return {'message': 'Logout successful'}, 200
+
+#     def get(self):
+#         # Check user session
+#         user_id = session.get('user_id')
+#         if user_id:
+#             user = db.session.get(User, user_id)
+#             if user:
+#                 return user.to_dict(), 200
+
+#         return {'message': 'User not authenticated'}, 401
 
 
 class SignUpResource(Resource):
@@ -224,61 +292,160 @@ def generate_page_id():
 
     return new_id
 
+# class CalendarEventResource(Resource):
+#     def get(self, event_id=None):
+#         if event_id is None:
+#             # Get all events
+#             events = CalendarEvent.query.all()
+#             # Serialize and return the events
+#             serialized_events = [event.to_dict() for event in events]
+#             return serialized_events, 200
+#         else:
+#             # Get a specific event
+#             event = CalendarEvent.query.get(event_id)
+#             if event:
+#                 return event.to_dict(), 200
+#             else:
+#                 return {'message': 'Event not found'}, 404
+
+#     def post(self):
+#         data = request.get_json()
+#         title = data.get('title')
+#         start = parse(data.get('start'))
+#         end = parse(data.get('end'))
+#         user_id = data.get('user_id')
+
+#         new_event = CalendarEvent(title=title, start=start, end=end, user_id=user_id)
+
+#         db.session.add(new_event)
+#         db.session.commit()
+
+#         return new_event.to_dict(), 201
+
+#     def patch(self, event_id):
+#         event = CalendarEvent.query.get(event_id)
+#         if event:
+#             data = request.get_json()
+#             if 'title' in data:
+#                 event.title = data.get('title')
+#             if 'start' in data:
+#                 start = datetime.strptime(data.get('start'), '%Y-%m-%dT%H:%M:%S.%fZ').replace(tzinfo=timezone.utc)
+#                 event.start = start
+#             if 'end' in data:
+#                 end = datetime.strptime(data.get('end'), '%Y-%m-%dT%H:%M:%S.%fZ').replace(tzinfo=timezone.utc)
+#                 event.end = end
+#             if 'user_id' in data:
+#                 event.user_id = data.get('user_id')
+#             if 'calendar_id' in data:
+#                 event.calendar_id = data.get('calendar_id')  # Update the calendar ID
+
+#             db.session.commit()
+
+#             return event.to_dict(), 200
+
+#     def delete(self, event_id):
+#         event = CalendarEvent.query.get(event_id)
+#         if event:
+#             db.session.delete(event)
+#             db.session.commit()
+#             return {'message': 'Event deleted'}, 200
+#         else:
+#             return {'message': 'Event not found'}, 404
 class CalendarEventResource(Resource):
     def get(self, event_id=None):
         if event_id is None:
             # Get all events
             events = CalendarEvent.query.all()
             # Serialize and return the events
-            serialized_events = [event.serialize() for event in events]
+            serialized_events = [event.to_dict() for event in events]
             return serialized_events, 200
         else:
             # Get a specific event
-            event = db.session.get(CalendarEvent, event_id)
+            event = CalendarEvent.query.get(event_id)
             if event:
-                return event.serialize(), 200
+                return event.to_dict(), 200
             else:
                 return {'message': 'Event not found'}, 404
 
     def post(self):
         data = request.get_json()
         title = data.get('title')
-        start = datetime.strptime(data.get('start'), '%Y-%m-%dT%H:%M:%S.%fZ')
-        end = datetime.strptime(data.get('end'), '%Y-%m-%dT%H:%M:%S.%fZ')
-        user_id = data.get('user_id')
+        start = parse(data.get('start'))
+        end = parse(data.get('end'))
+        user_ids = data.get('user_ids')
 
-        new_event = CalendarEvent(title=title, start=start, end=end, user_id=user_id)
+        new_event = CalendarEvent(title=title, start=start, end=end, created_by=user_ids[0])
+        
+        # Add users to the event
+        for user_id in user_ids:
+            user = User.query.get(user_id)
+            if user:
+                new_event.users.append(user)
 
         db.session.add(new_event)
         db.session.commit()
 
-        return new_event.serialize(), 201
+        return new_event.to_dict(), 201
+
 
     def patch(self, event_id):
-        event = db.session.get(CalendarEvent, event_id)
+        event = CalendarEvent.query.get(event_id)
         if event:
             data = request.get_json()
             if 'title' in data:
                 event.title = data.get('title')
             if 'start' in data:
-                event.start = datetime.strptime(data.get('start'), '%Y-%m-%dT%H:%M:%S.%fZ')
+                start = datetime.strptime(data.get('start'), '%Y-%m-%dT%H:%M:%S.%fZ').replace(tzinfo=timezone.utc)
+                event.start = start
             if 'end' in data:
-                event.end = datetime.strptime(data.get('end'), '%Y-%m-%dT%H:%M:%S.%fZ')
-            if 'user_id' in data:
-                event.user_id = data.get('user_id')
+                end = datetime.strptime(data.get('end'), '%Y-%m-%dT%H:%M:%S.%fZ').replace(tzinfo=timezone.utc)
+                event.end = end
+            if 'user_ids' in data:
+                # Clear the existing users
+                event.users.clear()
+                # Add the new users
+                for user_id in data.get('user_ids'):
+                    user = User.query.get(user_id)
+                    if user:
+                        event.users.append(user)
 
             db.session.commit()
 
-            return event.serialize(), 200
+            return event.to_dict(), 200
 
     def delete(self, event_id):
-        event = db.session.get(CalendarEvent, event_id)
+        event = CalendarEvent.query.get(event_id)
         if event:
+            # Disassociate users from the event
+            association_table = user_calendar_event_association
+            db.session.execute(association_table.delete().where(association_table.c.calendar_event_id == event.id))
             db.session.delete(event)
             db.session.commit()
             return {'message': 'Event deleted'}, 200
         else:
             return {'message': 'Event not found'}, 404
+
+
+
+
+
+
+
+
+
+
+
+class UserListResource(Resource):
+    def get(self):
+        username = request.args.get('username')
+        users = User.query.filter(User.username.ilike(f'%{username}%')).all()
+        if users:
+            user_data = [user.to_dict() for user in users]
+            return user_data, 200
+        else:
+            return [], 200
+
+api.add_resource(UserListResource, '/usernames')
 
 
 

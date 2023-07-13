@@ -32,12 +32,12 @@ const App = () => {
   return (
     <Router>
       <div className="">
-        {user && <Nav onLogout={handleLogout} />}
-
+        <Nav onLogout={handleLogout} />
+  
         <div className="container mx-auto px-4">
           <Switch>
-            <Route exact path="/">
-              {user ? <Redirect to="/dash" /> : <Landing />}
+            <Route exact path="/landing">
+              <Landing />
             </Route>
             <Route path="/dash">
               {user ? <Dash /> : <Redirect to="/login" />}
@@ -58,7 +58,7 @@ const App = () => {
               {user ? <Profile /> : <Redirect to="/login" />}
             </Route>
             <Route path="/page/:id">
-              <Page />
+              {user ? <Page /> : <Redirect to="/login" />}
             </Route>
             <Route path="/schedule">
               {user ? <Schedule /> : <Redirect to="/login" />}
