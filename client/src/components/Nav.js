@@ -1,10 +1,15 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { RiHome4Line, RiLogoutCircleLine, RiLoginCircleLine, RiInformationLine, RiUserLine, RiCalendarLine } from 'react-icons/ri';
 import { AppContext } from '../context/AppC';
 
 const Nav = () => {
   const { user, logout } = useContext(AppContext);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
 
   return (
     <nav className="bg-gray-800 py-4">
@@ -14,7 +19,35 @@ const Nav = () => {
             <RiHome4Line className="text-xl" />
             <span className="text-sm font-medium">Home</span>
           </Link>
-          <ul className="flex space-x-4">
+          <div className="lg:hidden">
+            <button
+              onClick={toggleMenu}
+              type="button"
+              className="text-white focus:outline-none"
+              aria-label="Toggle menu"
+            >
+              <svg
+                className="h-6 w-6 fill-current"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                {isMenuOpen ? (
+                  <path
+                    fillRule="evenodd"
+                    clipRule="evenodd"
+                    d="M4 6h16v2H4V6zm0 5h16v2H4v-2zm0 5h16v2H4v-2z"
+                  />
+                ) : (
+                  <path
+                    fillRule="evenodd"
+                    clipRule="evenodd"
+                    d="M4 5h16v2H4V5zm0 6h16v2H4v-2zm0 6h16v2H4v-2z"
+                  />
+                )}
+              </svg>
+            </button>
+          </div>
+          <ul className={`lg:flex ${isMenuOpen ? 'block' : 'hidden'} space-y-2 lg:space-y-0 lg:space-x-4`}>
             <li>
               <Link
                 to="/about"

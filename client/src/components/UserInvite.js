@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { AppContext } from '../context/AppC';
 
 const UserInvite = ({ onInvite }) => {
@@ -7,13 +7,24 @@ const UserInvite = ({ onInvite }) => {
   const [invitedUsers, setInvitedUsers] = useState([]);
   const { user } = useContext(AppContext);
 
+  useEffect(() => {
+    const storedInvitedUsers = localStorage.getItem('invitedUsers');
+    if (storedInvitedUsers) {
+      setInvitedUsers(JSON.parse(storedInvitedUsers));
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('invitedUsers', JSON.stringify(invitedUsers));
+  }, [invitedUsers]);
+
   const handleInvite = async () => {
     try {
       const response = await fetch(`/usernames?username=${username}`, {
         method: 'GET',
         headers: {
-          'Content-Type': 'application/json'
-        }
+          'Content-Type': 'application/json',
+        },
       });
 
       const data = await response.json();

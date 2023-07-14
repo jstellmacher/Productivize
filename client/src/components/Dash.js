@@ -12,14 +12,13 @@ const Dash = () => {
   const [filterOldestFirst, setFilterOldestFirst] = useState(false);
 
   useEffect(() => {
-    // Sort pages based on the created_at field
     let sortedPages = Array.isArray(user?.pages)
       ? [...user.pages]
       : [
           { id: 1, title: "Example Page 1", created_at: new Date() },
           { id: 2, title: "Page 2", created_at: new Date() },
         ];
-  
+
     sortedPages.sort((a, b) => {
       if (filterOldestFirst) {
         return new Date(a.created_at) - new Date(b.created_at);
@@ -27,16 +26,14 @@ const Dash = () => {
         return new Date(b.created_at) - new Date(a.created_at);
       }
     });
-  
+
     setPages(sortedPages);
   }, [user, filterOldestFirst]);
-  
 
   const handleAddPage = () => {
     const newPage = { title: "New Page" };
     addPage(newPage);
   };
-
 
   const handleDeletePage = (event, pageId) => {
     event.stopPropagation();
@@ -106,8 +103,8 @@ const Dash = () => {
               <TiPlus className="h-10 w-10 sm:h-14 sm:w-14 text-blue-500" />
             </div>
           </div>
-  
-          {user.pages.map((page) => (
+
+          {pages.map((page) => (
             <div key={page.id}>
               <div
                 className="relative bg-white rounded-lg shadow-xl cursor-pointer flex flex-col justify-center w-40 h-40 sm:w-56 sm:h-56 hover:bg-blue-200"
@@ -132,7 +129,7 @@ const Dash = () => {
                     </h3>
                   </div>
                 )}
-  
+
                 <div className="flex justify-between absolute top-0 w-full">
                   <button
                     onClick={() => handleEditPage(page.id)}
@@ -152,15 +149,13 @@ const Dash = () => {
           ))}
         </div>
       </div>
-  
-      <div>
-        <p>Have fun exploring the dashboard!</p>
+
+      <div className="text-center">
+        <p className="mb-2">Have fun exploring the dashboard!</p>
         <p>More exciting features coming soon.</p>
       </div>
     </div>
   );
-  
-  
 };
 
 export default Dash;

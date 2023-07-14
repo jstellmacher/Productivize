@@ -1,7 +1,8 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useContext } from 'react'; // Import useContext
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
 import UserInvite from './UserInvite';
+import { AppContext } from '../context/AppC';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 
 const localizer = momentLocalizer(moment);
@@ -9,13 +10,12 @@ const localizer = momentLocalizer(moment);
 const Schedule = () => {
   const [events, setEvents] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState(null);
-  const [userId, setUserId] = useState(null); // Add user ID state
-  const [invitedUsers, setInvitedUsers] = useState([]); // Track invited users
+  const { user } = useContext(AppContext); // Use useContext with AppContext
 
-const fetchEvents = useCallback(() => {
-  const user = getUser();
-  if (user) {
-    fetch(`/events?user_id=${user.id}`)
+  const fetchEvents = useCallback(() => {
+    const fetchUrl = `/events?user_id=${user.id}`;
+
+    fetch(fetchUrl)
       .then(response => response.json())
       .then(data => {
         const editableEvents = data.map(event => ({
@@ -28,27 +28,11 @@ const fetchEvents = useCallback(() => {
       .catch(error => {
         console.error('Error:', error);
       });
-  }
-}, []);
+  }, [user]);
 
-useEffect(() => {
-  const user = getUser();
-  if (user) {
-    setUserId(user.id);
-  }
-
-  fetchEvents();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-}, [fetchEvents]);
-
-
-  const getUser = () => {
-    // Replace this with your actual user authentication logic
-    return {
-      id: 1, // User ID
-      // Other user properties
-    };
-  };
+  useEffect(() => {
+    fetchEvents();
+  }, [fetchEvents]);
 
   const handleEventSelect = event => {
     if (event.isEditable) {
@@ -129,7 +113,7 @@ useEffect(() => {
         title,
         start,
         end,
-        user_ids: [userId]
+        user_ids: [user.id]
       };
 
       fetch('/events', {
